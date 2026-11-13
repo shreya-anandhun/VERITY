@@ -403,7 +403,7 @@ async function disconnectWallet() {
     const provider = getProvider();
     try {
         // Newer wallets let a site give back its permission
-        await provider.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
+        if (provider && currentAccount) await provider.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
     } catch (err) {}
     try {
         localStorage.setItem("verity-disconnected", "1");
@@ -413,6 +413,8 @@ async function disconnectWallet() {
     if (nameInput) nameInput.value = "";
     showDisconnected();
     showGreeting();
+    updateSignOutLink();
+    profilePanel.classList.remove("open");
     toast("Signed out. See you next time.", "");
 }
 
@@ -455,6 +457,18 @@ if (connectModal) {
 
 // Big "Connect Wallet" on the Home card
 if (connectBtn) connectBtn.addEventListener("click", openConnectModal);
+
+// Secondary "Sign out" link: shown whenever a name is saved but no wallet is connected
+function updateSignOutLink() {
+    const el = document.getElementById("ppSignOut");
+    if (el) el.classList.toggle("hidden", !(getName() && !currentAccount));
+}
+const ppSignOut = document.getElementById("ppSignOut");
+if (ppSignOut) ppSignOut.addEventListener("click", disconnectWallet);
+document.addEventListener("wallet-connected", updateSignOutLink);
+document.addEventListener("wallet-disconnected", updateSignOutLink);
+document.addEventListener("wallet-ready", updateSignOutLink);
+if (nameInput) nameInput.addEventListener("input", updateSignOutLink);
 
 // Button in the profile panel: connect or disconnect
 const ppWalletBtn = document.getElementById("ppWalletBtn");
@@ -512,6 +526,7 @@ document.getElementById("nameForm").addEventListener("submit", (e) => {
     saveName(first);
     nameInput.value = first;
     showGreeting();
+    updateSignOutLink();
 
     document.getElementById("welcomeHello").textContent = `Lovely to meet you, ${first}!`;
     document.getElementById("welcomeStep1").classList.add("hidden");

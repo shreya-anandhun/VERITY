@@ -1694,3 +1694,5 @@ select.field {
     .intro-card { padding: 24px 18px 22px; }
     .intro-name { font-size: 1.5rem; }
 }
+.pp-signout { display: block; width: 100%; margin-top: 10px; font-size: 0.8rem; color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
+.pp-signout:hover { color: #ff8a8a; }
