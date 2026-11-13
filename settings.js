@@ -5,7 +5,7 @@
 /* Theme */
 const themePick = document.getElementById("themePick");
 function markTheme() {
-    const t = getSetting("theme", "dark");
+    const t = getSetting("theme", "light");
     themePick.querySelectorAll(".theme-opt").forEach((b) => b.classList.toggle("on", b.dataset.theme === t));
 }
 themePick.addEventListener("click", (e) => {

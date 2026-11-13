@@ -27,7 +27,7 @@ function setSetting(key, value) {
 }
 // Light or dark: sets data-theme on <html>, which style.css reads
 function applyTheme() {
-    document.documentElement.dataset.theme = getSetting("theme", "dark");
+    document.documentElement.dataset.theme = getSetting("theme", "light");
 }
 applyTheme();
 
