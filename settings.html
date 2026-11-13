@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings · VERITY</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap">
+
+    <link rel="stylesheet" href="style.css">
+    <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("verity-theme"))||"dark"}catch(e){}</script>
+</head>
+<body>
+
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="sparkle" viewBox="-1 -1 2 2">
+            <path d="M0,-1 C0.08,-0.08 0.08,-0.08 1,0 C0.08,0.08 0.08,0.08 0,1 C-0.08,0.08 -0.08,0.08 -1,0 C-0.08,-0.08 -0.08,-0.08 0,-1Z"/>
+        </symbol>
+    </svg>
+
+    <!-- ============ SIDEBAR (same as Home) ============ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <svg class="brand-mark"><use href="#sparkle"/></svg>
+            <span>VERITY</span>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+                Home
+            </a>
+            <a href="live.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+                Live Polls
+            </a>
+            <a href="polls.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>
+                Create Poll
+            </a>
+            <a href="activity.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
+                Transactions
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+                Settings
+            </a>
+            <a href="how-it-works.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17.5" r=".6"/></svg>
+                How It Works
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="network-dot"></span> Ethereum Sepolia
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main main-wide">
+
+        <header class="topbar">
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <h1 class="page-title">Settings</h1>
+
+            <div class="profile-wrap">
+                <button class="profile-btn" id="profileBtn" aria-label="Profile and wallet" aria-haspopup="dialog" aria-expanded="false">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </button>
+                <div class="profile-panel" id="profilePanel">
+                    <div class="pp-head">
+                        <div class="pp-avatar">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                        </div>
+                        <div>
+                            <input class="pp-name" id="displayName" placeholder="Add a display name" maxlength="24">
+                            <p class="pp-address" id="ppAddress">Wallet not connected</p>
+                        </div>
+                    </div>
+                    <div class="pp-stats">
+                        <div><span id="statVoted">0</span><small>Polls voted</small></div>
+                        <div><span id="statCreated">0</span><small>Polls created</small></div>
+                    </div>
+                    <p class="pp-label">Your votes</p>
+                    <ul class="pp-list" id="ppVotes">
+                        <li class="muted">Connect your wallet to see your votes</li>
+                    </ul>
+                    <button class="pp-wallet-btn" id="ppWalletBtn">Connect Wallet</button>
+                    <p class="pp-note">Your display name is saved only on this device. VERITY never asks for personal details.</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="content settings">
+
+            <!-- 1. THEME -->
+            <div class="set-group">
+                <h2 class="set-title">Theme</h2>
+                <div class="theme-pick" id="themePick">
+                    <button class="theme-opt" data-theme="dark">
+                        <span class="theme-swatch dark"><i></i><i></i></span>
+                        Dark
+                    </button>
+                    <button class="theme-opt" data-theme="light">
+                        <span class="theme-swatch light"><i></i><i></i></span>
+                        Light
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. NOTIFICATIONS -->
+            <div class="set-group">
+                <h2 class="set-title">Notifications</h2>
+                <label class="set-row">
+                    <span>
+                        <strong>Alert me when a poll I voted in ends</strong>
+                        <small>A small message appears on VERITY with the result. Nothing is sent to your email or phone.</small>
+                    </span>
+                    <input type="checkbox" class="switch" id="notifEnds">
+                </label>
+                <label class="set-row">
+                    <span>
+                        <strong>Alert me when a poll I created gets its first vote</strong>
+                        <small>Only shown while you're on the site.</small>
+                    </span>
+                    <input type="checkbox" class="switch" id="notifFirst">
+                </label>
+            </div>
+
+            <!-- 3. VOTING -->
+            <div class="set-group">
+                <h2 class="set-title">Voting confirmation</h2>
+                <label class="set-row">
+                    <span>
+                        <strong>Ask me to confirm before every vote</strong>
+                        <small>Shows a "Yes, cast my vote" popup first. Turn it off for one-tap voting. Your wallet will still ask you to sign either way.</small>
+                    </span>
+                    <input type="checkbox" class="switch" id="confirmVotes">
+                </label>
+            </div>
+
+            <!-- 4. NETWORK & ADVANCED -->
+            <div class="set-group">
+                <h2 class="set-title">Network &amp; advanced</h2>
+                <div class="set-row static">
+                    <span>
+                        <strong>Network</strong>
+                        <small>Where VERITY's votes are recorded</small>
+                    </span>
+                    <span class="net-badge"><span class="network-dot"></span> Ethereum Sepolia <em>Testnet</em></span>
+                </div>
+                <div class="set-row static">
+                    <span>
+                        <strong>Voting contract</strong>
+                        <small class="mono" id="contractAddr">—</small>
+                    </span>
+                    <span class="row-btns">
+                        <button class="small-btn" id="copyAddr">Copy</button>
+                        <a class="small-btn" id="contractLink" href="#" target="_blank" rel="noopener">Etherscan ↗</a>
+                    </span>
+                </div>
+                <div class="set-row static">
+                    <span>
+                        <strong>Wallet</strong>
+                        <small id="setWallet">Not connected</small>
+                    </span>
+                    <button class="small-btn" id="setWalletBtn">Connect</button>
+                </div>
+            </div>
+
+            <!-- 5. ABOUT -->
+            <div class="set-group">
+                <h2 class="set-title">About</h2>
+                <div class="set-row static">
+                    <span><strong>Version</strong><small>VERITY 1.0 · Beta</small></span>
+                </div>
+                <div class="set-row static">
+                    <span><strong>Help</strong><small>verity.helpdesk@gmail.com</small></span>
+                    <a class="small-btn" href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Help">Email us</a>
+                </div>
+                <div class="set-row static">
+                    <span><strong>Something broken?</strong><small>Tell us what happened and we'll look into it.</small></span>
+                    <a class="small-btn danger" href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report">Report an issue</a>
+                </div>
+            </div>
+
+            <p class="set-note">Your settings are saved only in this browser. VERITY never collects personal details.</p>
+        </section>
+
+        <footer class="footer">
+            <a href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report" class="report-link">
+                <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>
+                Report an issue
+            </a>
+            <span class="muted">VERITY · Built on Ethereum</span>
+        </footer>
+    </main>
+
+    <!-- ============ CONNECT WALLET POPUP ============ -->
+    <div class="welcome-backdrop hidden" id="connectModal">
+        <div class="welcome-box">
+            <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
+            <p class="welcome-kicker">Connect wallet</p>
+            <h2>Do you already use <span data-wallet-name>Phantom</span>?</h2>
+            <p class="welcome-text">VERITY works with Phantom (recommended) or MetaMask. Your wallet opens its own window to unlock and approve, so VERITY never sees your password.</p>
+
+            <div class="wallet-choices">
+                <button class="wallet-choice" id="connectHave">
+                    <span class="wc-icon">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>
+                    </span>
+                    <span>
+                        <strong>Yes, connect my <span data-wallet-name>Phantom</span> wallet</strong>
+                        <small><span data-wallet-name>Phantom</span> will ask you to unlock and approve the connection.</small>
+                    </span>
+                </button>
+                <a class="wallet-choice" id="connectNew" href="https://phantom.com/download" target="_blank" rel="noopener">
+                    <span class="wc-icon new">
+                        <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
+                    </span>
+                    <span>
+                        <strong>No, I'm new to Phantom</strong>
+                        <small>Get the free Phantom extension from the official site, then come back.</small>
+                    </span>
+                </a>
+            </div>
+
+            <p class="welcome-text hidden" id="connectNoExt">No wallet is installed in this browser yet, so the first step is to get Phantom.</p>
+            <button class="later-btn" id="connectCancel">Cancel</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+    <script src="contract.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
