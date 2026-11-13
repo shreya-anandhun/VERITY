@@ -118,7 +118,7 @@ function paint() {
     const connected = !!currentAccount;
     emptyNotConn.classList.toggle("hidden", connected);
     historySection.classList.toggle("hidden", !connected);
-    verifyForm.classList.toggle("hidden", !connected);
+    verifyForm.classList.remove("hidden");                 // verifying a hash needs no wallet
     if (!connected) { liveSection.classList.add("hidden"); return; }
     renderTracker();
     renderHistory();

@@ -17,9 +17,18 @@ const VOTING_ABI = [
     "event PollClosed(uint256 indexed pollId)"
 ];
 
-// Public Sepolia node for READING (works even with no wallet connected)
-const SEPOLIA_RPC = "https://ethereum-sepolia-rpc.publicnode.com";
-const readProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC);
+// Public Sepolia nodes for READING (works even with no wallet connected).
+// If the first one is slow or rate-limited, ethers moves to the next.
+const SEPOLIA_RPCS = [
+    "https://ethereum-sepolia-rpc.publicnode.com",
+    "https://sepolia.drpc.org",
+    "https://rpc.sepolia.org"
+];
+const SEPOLIA_NET = { chainId: 11155111, name: "sepolia" };
+const readProvider = new ethers.FallbackProvider(
+    SEPOLIA_RPCS.map((url, i) => ({ provider: new ethers.JsonRpcProvider(url, SEPOLIA_NET, { staticNetwork: true }), priority: i + 1, stallTimeout: 2500, weight: 1 })),
+    SEPOLIA_NET, { quorum: 1 }
+);
 const readContract = new ethers.Contract(CONTRACT_ADDRESS, VOTING_ABI, readProvider);
 
 // The block the contract was deployed in: no events exist before it

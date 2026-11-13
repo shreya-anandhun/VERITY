@@ -124,7 +124,7 @@ function render() {
             <p class="verified-line">
                 Your vote is recorded on Ethereum Sepolia ·
                 <a href="${myVoteTxs[p.id] ? "https://sepolia.etherscan.io/tx/" + myVoteTxs[p.id] : "https://sepolia.etherscan.io/address/" + CONTRACT_ADDRESS}" target="_blank" rel="noopener">${myVoteTxs[p.id] ? "View your vote on Etherscan ↗" : "View the contract on Etherscan ↗"}</a>
-            </p>` : `<p class="hint-line">Pick an option to cast your vote. You can only vote once.</p>`}
+            </p>` : `<p class="hint-line">Pick an option to cast your vote. You can only vote once.<br><small>Results are revealed after you vote, so nobody is swayed by the crowd. Totals are public on Etherscan at any time.</small></p>`}
 
             <div class="meta-row">
                 <div class="meta">

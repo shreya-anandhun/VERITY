@@ -1669,3 +1669,4 @@ select.field {
 /* Buttons without the arrow circle: symmetric padding, centred text */
 .connect-btn:not(:has(.connect-arrow)) { padding: 14px 28px; justify-content: center; }
 .report-preview { scroll-padding-top: 0; }
+.hint-line small { display: block; margin-top: 6px; color: var(--text-dim); font-size: 0.78rem; line-height: 1.45; }

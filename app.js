@@ -425,6 +425,14 @@ function openConnectModal() {
     connectModal.classList.remove("hidden");
 }
 function closeConnectModal() { if (connectModal) connectModal.classList.add("hidden"); }
+function refreshWalletNames() {
+    const name = walletName();
+    document.querySelectorAll("[data-wallet-name]").forEach((el) => el.textContent = name);
+    const nw = document.getElementById("connectNew");
+    if (nw) nw.classList.toggle("hidden", !!getProvider() && name === "MetaMask");   // they already have a wallet
+}
+refreshWalletNames();
+document.addEventListener("wallet-ready", refreshWalletNames);
 
 if (connectModal) {
     document.getElementById("connectHave").addEventListener("click", () => {
@@ -466,7 +474,7 @@ function showWelcomeIfNeeded() {
     const decide = () => {
         if (!getName()) {
             welcomeModal.classList.remove("hidden");
-        } else if (!currentAccount) {
+        } else if (!currentAccount && !sessionStorage.getItem("verity-welcomed")) {
             document.getElementById("welcomeHello").textContent = `Welcome back, ${getName()}!`;
             document.getElementById("welcomeStep1").classList.add("hidden");
             document.getElementById("welcomeStep2").classList.remove("hidden");
@@ -501,7 +509,10 @@ document.getElementById("nameForm").addEventListener("submit", (e) => {
     document.getElementById("welcomeStep2").classList.remove("hidden");
 });
 
-function closeWelcome() { welcomeModal.classList.add("hidden"); }
+function closeWelcome() {
+    welcomeModal.classList.add("hidden");
+    try { sessionStorage.setItem("verity-welcomed", "1"); } catch (err) {}   // don't nag again this session
+}
 
 document.getElementById("welcomeConnect").addEventListener("click", () => {
     closeWelcome();

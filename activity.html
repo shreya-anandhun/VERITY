@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap">
 
+    <meta name="description" content="VERITY: transparent voting on Ethereum Sepolia. One wallet, one vote, verifiable by anyone.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#EEF2F0">
     <link rel="stylesheet" href="style.css">
     <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("verity-theme"))||"light"}catch(e){}</script>
 </head>
@@ -39,7 +42,7 @@
             </a>
             <a href="polls.html" class="nav-item">
                 <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>
-                Create Poll
+                Polls
             </a>
             <a href="activity.html" class="nav-item active">
                 <svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
@@ -137,8 +140,8 @@
             <div class="empty-connect hidden" id="emptyNotConnected">
                 <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
                 <p class="welcome-kicker">Transactions</p>
-                <h2>Connect your wallet to see your activity</h2>
-                <p class="welcome-text">Every vote and poll you create is recorded on Ethereum Sepolia. Connect to track them here.</p>
+                <h2>Connect your wallet to see your own activity</h2>
+                <p class="welcome-text">Every vote and poll you create is recorded on Ethereum Sepolia. Connect to track them here. You can verify any transaction hash above without connecting.</p>
                 <button class="connect-btn" id="activityConnect">
                     <span>Connect Wallet</span>
                     <span class="connect-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
@@ -178,8 +181,8 @@
                         <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
                     </span>
                     <span>
-                        <strong>No, I'm new to Phantom</strong>
-                        <small>Get the free Phantom extension from the official site, then come back.</small>
+                        <strong>No, I don't have a wallet yet</strong>
+                        <small>Get Phantom (free, recommended) from the official site, then come back.</small>
                     </span>
                 </a>
             </div>

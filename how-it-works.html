@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap">
 
+    <meta name="description" content="VERITY: transparent voting on Ethereum Sepolia. One wallet, one vote, verifiable by anyone.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#EEF2F0">
     <link rel="stylesheet" href="style.css">
     <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("verity-theme"))||"light"}catch(e){}</script>
 </head>
@@ -39,7 +42,7 @@
             </a>
             <a href="polls.html" class="nav-item">
                 <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>
-                Create Poll
+                Polls
             </a>
             <a href="activity.html" class="nav-item">
                 <svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
@@ -186,6 +189,8 @@
                 <details><summary>Is my vote anonymous?</summary><p>Your wallet <b>address</b> is public with your vote, but nothing links that address to your name unless you share it. VERITY never asks for personal details; your display name stays in your own browser.</p></details>
                 <details><summary>What is the "network fee"?</summary><p>Every blockchain transaction costs a little ETH to process. VERITY runs on <b>Sepolia</b>, a test network, so the ETH is free from a faucet and has no real value.</p></details>
                 <details><summary>Can a vote be changed or deleted?</summary><p>No. Once a block is confirmed, changing it would mean rewriting the whole chain across thousands of computers. That permanence is the point.</p></details>
+                <details><summary>Why can't I see results before voting?</summary><p>On purpose. Hiding the tally until you've voted stops people from just joining the crowd. The counts are still public: anyone can read them from the contract on Etherscan at any time, and they appear on VERITY the moment the poll ends.</p></details>
+                <details><summary>Could someone vote twice with two wallets?</summary><p>Yes. "One wallet, one vote" means one <b>wallet</b>, and a person can create several. That's acceptable for club polls among people who know each other; it's not a system for high-stakes elections. A stricter version would check membership before letting a wallet vote.</p></details>
                 <details><summary>What if the website goes down?</summary><p>The votes are still on Sepolia. Anyone can read the contract directly on Etherscan, so the results exist independently of VERITY.</p></details>
             </div>
         </section>
@@ -222,8 +227,8 @@
                         <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
                     </span>
                     <span>
-                        <strong>No, I'm new to Phantom</strong>
-                        <small>Get the free Phantom extension from the official site, then come back.</small>
+                        <strong>No, I don't have a wallet yet</strong>
+                        <small>Get Phantom (free, recommended) from the official site, then come back.</small>
                     </span>
                 </a>
             </div>
