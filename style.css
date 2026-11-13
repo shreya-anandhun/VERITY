@@ -1670,3 +1670,27 @@ select.field {
 .connect-btn:not(:has(.connect-arrow)) { padding: 14px 28px; justify-content: center; }
 .report-preview { scroll-padding-top: 0; }
 .hint-line small { display: block; margin-top: 6px; color: var(--text-dim); font-size: 0.78rem; line-height: 1.45; }
+
+/* ---------- 20. Home intro ---------- */
+.intro-card {
+    text-align: center;
+    padding: 30px 28px 28px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+.intro-card:hover { box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 28px rgba(187, 255, 216, 0.10); }
+:root[data-theme="light"] .intro-card:hover { border-color: #6A66A4; box-shadow: 0 0 0 1.5px rgba(106, 102, 164, 0.7), 0 8px 32px rgba(106, 102, 164, 0.3); }
+.intro-name {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: var(--font-head); font-weight: 600; font-size: 1.9rem; letter-spacing: 0.22em;
+}
+.intro-mark { width: 20px; height: 20px; fill: var(--mint); stroke: none; }
+:root[data-theme="light"] .intro-mark { fill: #6A66A4; }
+.intro-lead { margin-top: 12px; font-family: var(--font-head); font-weight: 500; font-size: 1.15rem; }
+.intro-text { margin: 8px auto 0; max-width: 460px; color: var(--text-dim); font-size: 0.95rem; line-height: 1.55; }
+@media (max-width: 860px) {
+    .intro-card { padding: 24px 18px 22px; }
+    .intro-name { font-size: 1.5rem; }
+}
