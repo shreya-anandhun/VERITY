@@ -322,7 +322,7 @@ async function showConnected(address) {
 
     // Profile panel button becomes "Disconnect"
     const ppBtn = document.getElementById("ppWalletBtn");
-    if (ppBtn) { ppBtn.textContent = "Disconnect"; ppBtn.classList.add("disconnect"); }
+    if (ppBtn) { ppBtn.textContent = "Sign out"; ppBtn.classList.add("disconnect"); }
 
     // Balance comes back in "wei" (1 ETH = 10^18 wei), as a hex string
     try {
@@ -397,14 +397,23 @@ async function connectWallet() {
 }
 // Disconnect = VERITY forgets the wallet. Phantom itself stays logged in;
 // fully removing the site is done inside Phantom (Connected apps).
+// Sign out = VERITY forgets the wallet AND the display name (theme and settings stay).
+// Phantom itself keeps its own memory of the site; fully removing VERITY is done inside Phantom.
 async function disconnectWallet() {
     const provider = getProvider();
     try {
         // Newer wallets let a site give back its permission
         await provider.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] });
     } catch (err) {}
-    try { localStorage.setItem("verity-disconnected", "1"); } catch (err) {}
+    try {
+        localStorage.setItem("verity-disconnected", "1");
+        localStorage.removeItem("verity-name");
+        sessionStorage.removeItem("verity-welcomed");
+    } catch (err) {}
+    if (nameInput) nameInput.value = "";
     showDisconnected();
+    showGreeting();
+    toast("Signed out. See you next time.", "");
 }
 
 

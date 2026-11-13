@@ -39,7 +39,7 @@ document.getElementById("copyAddr").addEventListener("click", async (e) => {
 const setWalletBtn = document.getElementById("setWalletBtn");
 function renderWallet() {
     document.getElementById("setWallet").textContent = currentAccount ? shortAddress(currentAccount) : "Not connected";
-    setWalletBtn.textContent = currentAccount ? "Disconnect" : "Connect";
+    setWalletBtn.textContent = currentAccount ? "Sign out" : "Connect";
     setWalletBtn.classList.toggle("danger", !!currentAccount);
 }
 setWalletBtn.addEventListener("click", () => currentAccount ? disconnectWallet() : openConnectModal());
