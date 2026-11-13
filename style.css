@@ -1632,7 +1632,7 @@ input[type="datetime-local"].field { color-scheme: dark; }
     margin: 4px 0 18px; padding: 14px 16px; border-radius: 12px;
     background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line);
     font-family: monospace; font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; color: var(--text-dim);
-    max-height: 180px; overflow: auto;
+    max-height: 260px; overflow: auto;
 }
 :root[data-theme="light"] .report-preview { background: #F6F8F7; }
 .link-btn { color: var(--mint); text-decoration: underline; font: inherit; }
@@ -1666,3 +1666,6 @@ select.field {
 /* Popup borders follow the theme accent */
 :root[data-theme="light"] .welcome-box { border-color: rgba(106, 102, 164, 0.5); }
 :root[data-theme="light"] .field:focus { border-color: #6A66A4; }
+/* Buttons without the arrow circle: symmetric padding, centred text */
+.connect-btn:not(:has(.connect-arrow)) { padding: 14px 28px; justify-content: center; }
+.report-preview { scroll-padding-top: 0; }
