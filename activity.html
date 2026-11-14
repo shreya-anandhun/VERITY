@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions · VERITY</title>
+    <title>My Activity · VERITY</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +46,7 @@
             </a>
             <a href="activity.html" class="nav-item active">
                 <svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
-                Transactions
+                My Activity
             </a>
             <a href="settings.html" class="nav-item">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -72,7 +72,7 @@
             <button class="menu-btn" id="menuBtn" aria-label="Open menu">
                 <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
-            <h1 class="page-title">Transactions</h1>
+            <h1 class="page-title">My Activity</h1>
 
             <div class="profile-wrap">
                 <button class="profile-btn" id="profileBtn" aria-label="Profile and wallet" aria-haspopup="dialog" aria-expanded="false">
@@ -105,10 +105,18 @@
 
         <section class="content content-wide waiting">
 
+            <!-- 0. SUMMARY TILES -->
+            <div class="act-tiles" id="actTiles">
+                <div class="act-tile primary"><b id="statConfirmed">0</b><small>confirmed</small></div>
+                <div class="act-tile"><b id="statFailed">0</b><small>failed</small></div>
+                <div class="act-tile"><b id="statCreatedTx">0</b><small>polls created</small></div>
+                <div class="act-tile soft"><b id="statFees" class="fee">—</b><small>fees paid</small></div>
+            </div>
+
             <!-- 1. VERIFY A TRANSACTION -->
             <form class="verify-bar" id="verifyForm" autocomplete="off">
                 <svg class="verify-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input id="verifyInput" placeholder="Paste a transaction hash to verify (0x…)" spellcheck="false">
+                <input id="verifyInput" placeholder="Paste any transaction hash to verify (0x…)" spellcheck="false">
                 <button type="submit" class="verify-btn">Verify</button>
             </form>
             <div class="verify-result hidden" id="verifyResult"></div>
@@ -122,25 +130,28 @@
                 <div id="trackList"></div>
             </div>
 
-            <!-- 3. HISTORY -->
+            <!-- 3. TIMELINE -->
             <div id="historySection">
                 <div class="section-head">
-                    <h2>History</h2>
-                    <select id="filterSel" class="filter-select">
-                        <option value="all">All</option>
-                        <option value="vote">Votes</option>
-                        <option value="create">Created</option>
-                        <option value="failed">Failed</option>
-                    </select>
+                    <h2>Timeline</h2>
+                    <div class="row-btns">
+                        <select id="filterSel" class="filter-select">
+                            <option value="all">All</option>
+                            <option value="vote">Votes</option>
+                            <option value="create">Created</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                        <button class="small-btn" id="exportCsv">Export CSV</button>
+                    </div>
                 </div>
-                <div class="tx-list" id="txList"></div>
+                <div class="timeline" id="txList"></div>
                 <div class="empty-poll hidden" id="emptyNoTx">No transactions yet</div>
             </div>
 
             <!-- Shown instead of everything when the wallet isn't connected -->
             <div class="empty-connect hidden" id="emptyNotConnected">
                 <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
-                <p class="welcome-kicker">Transactions</p>
+                <p class="welcome-kicker">My Activity</p>
                 <h2>Connect your wallet to see your own activity</h2>
                 <p class="welcome-text">Every vote and poll you create is recorded on Ethereum Sepolia. Connect to track them here. You can verify any transaction hash above without connecting.</p>
                 <button class="connect-btn" id="activityConnect">
@@ -158,6 +169,19 @@
             <span class="muted">VERITY · Built on Ethereum</span>
         </footer>
     </main>
+
+    <!-- ============ RECEIPT POPUP ============ -->
+    <div class="welcome-backdrop hidden" id="receiptModal">
+        <div class="welcome-box wide-box">
+            <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
+            <p class="welcome-kicker">Receipt</p>
+            <h2 id="receiptTitle">…</h2>
+            <div id="receiptBody"></div>
+            <div class="welcome-actions">
+                <button type="button" class="later-btn" id="receiptClose">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- ============ CONNECT WALLET POPUP ============ -->
     <div class="welcome-backdrop hidden" id="connectModal">

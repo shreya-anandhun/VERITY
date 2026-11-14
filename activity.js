@@ -82,7 +82,7 @@ async function loadHistory() {
     await Promise.all(list.map(async (tx) => {
         try {
             const r = await readProvider.getTransactionReceipt(tx.hash);
-            if (r) tx.gas = feeText(r);
+            if (r) { tx.gas = feeText(r); tx.feeWei = r.gasUsed * (r.gasPrice || 0n); }
         } catch (err) {}
     }));
 
@@ -160,7 +160,17 @@ function renderTracker() {
     }).join("");
 }
 
-/* 3. History list with filter + expandable rows */
+/* 3. Timeline, grouped by day */
+function dayLabel(ts) {
+    const d = new Date(ts), now = new Date();
+    const sameDay = (a, b) => a.toDateString() === b.toDateString();
+    if (sameDay(d, now)) return "Today";
+    const y = new Date(now); y.setDate(now.getDate() - 1);
+    if (sameDay(d, y)) return "Yesterday";
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+}
+function clockTime(ts) { return new Date(ts).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); }
+
 function renderHistory() {
     const f = filterSel.value;
     let list = transactions.filter((t) => t.status !== "pending");
@@ -168,31 +178,69 @@ function renderHistory() {
     else if (f !== "all") list = list.filter((t) => t.type === f);
     list.sort((a, b) => b.time - a.time);
 
-    emptyNoTx.classList.toggle("hidden", list.length > 0);
-    emptyNoTx.textContent = transactions.some((t) => t.status !== "pending")
-        ? "Nothing matches this filter" : "No transactions yet";
+    // Summary tiles (always from the full list, not the filter)
+    const all = transactions.filter((t) => t.status !== "pending");
+    setText("statConfirmed", all.filter((t) => t.status === "confirmed").length);
+    setText("statFailed", all.filter((t) => t.status === "failed").length);
+    setText("statCreatedTx", all.filter((t) => t.type === "create" && t.status === "confirmed").length);
+    const feeWei = all.reduce((n, t) => n + (t.feeWei || 0n), 0n);
+    setText("statFees", feeWei ? feeText({ gasUsed: feeWei, gasPrice: 1n }) : "0 ETH");
 
+    emptyNoTx.classList.toggle("hidden", list.length > 0);
+    emptyNoTx.textContent = all.length ? "Nothing matches this filter" : "No transactions yet";
+
+    let lastDay = null;
     txList.innerHTML = list.map((t) => {
         const key = t.hash || "f" + t.time;
-        const open = key === expandedHash;
+        const day = dayLabel(t.time);
+        const head = day !== lastDay ? `<div class="tl-day">${day}</div>` : "";
+        lastDay = day;
+        const kind = t.status === "failed" ? "failed" : t.type === "create" ? "create" : "vote";
+        const icon = kind === "failed" ? "!" : kind === "create" ? "+" : "✓";
         return `
-        <article class="tx-row ${open ? "open" : ""} ${t.status}" data-hash="${key}">
-            <button class="tx-main" data-toggle="${key}" aria-expanded="${open}" aria-label="Show details: ${typeLabel(t)} ${escapeHTML(t.poll)}">
-                <span class="tx-icon">${typeIcon[t.type]}</span>
-                <span class="tx-text">
-                    <strong>${typeLabel(t)}${t.option ? ` · ${escapeHTML(t.option)}` : ""}</strong>
-                    <small>${escapeHTML(t.poll)}</small>
-                </span>
-                <span class="tx-right">
-                    <span class="status-pill ${t.status}">${statusText[t.status]}</span>
-                    <span class="tx-time">${timeAgo(t.time)}</span>
-                </span>
-                <svg class="tx-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="tx-details"><div>${detailsHTML(t)}</div></div>
+        ${head}
+        <div class="tl-when"><b>${clockTime(t.time)}</b>${timeAgo(t.time)}</div>
+        <div class="tl-node"><i class="${kind}"></i></div>
+        <article class="tl-card ${kind}" data-hash="${key}">
+            <span class="tl-ic">${icon}</span>
+            <span class="tl-text">
+                <strong>${typeLabel(t)}${t.option ? ` · ${escapeHTML(t.option)}` : ""}</strong>
+                <small>${escapeHTML(t.poll)}${t.block ? ` · block #${t.block.toLocaleString("en-US")}` : ""}${t.reason ? ` · ${escapeHTML(t.reason)}` : ""}</small>
+            </span>
+            <span class="tl-right">
+                <span class="status-pill ${t.status}">${statusText[t.status]}</span>
+                ${t.hash ? `<button class="small-btn" data-receipt="${key}">Receipt</button>` : ""}
+            </span>
         </article>`;
     }).join("");
 }
+
+// Receipt popup
+const receiptModal = document.getElementById("receiptModal");
+txList.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-receipt]");
+    if (!b) return;
+    const t = transactions.find((x) => (x.hash || "f" + x.time) === b.dataset.receipt);
+    if (!t) return;
+    document.getElementById("receiptTitle").textContent = typeLabel(t) + (t.option ? ` · ${t.option}` : "");
+    document.getElementById("receiptBody").innerHTML = detailsHTML(t);
+    receiptModal.classList.remove("hidden");
+});
+document.getElementById("receiptClose").addEventListener("click", () => receiptModal.classList.add("hidden"));
+receiptModal.addEventListener("click", (e) => { if (e.target === receiptModal) receiptModal.classList.add("hidden"); });
+
+// Export CSV
+document.getElementById("exportCsv").addEventListener("click", () => {
+    const rows = [["type", "status", "poll", "option", "time", "block", "fee", "hash", "reason"]];
+    for (const t of transactions) rows.push([typeLabel(t), t.status, t.poll, t.option || "", new Date(t.time).toISOString(), t.block || "", t.gas || "", t.hash || "", t.reason || ""]);
+    const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "verity-activity.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+});
+filterSel.addEventListener("change", renderHistory);
 
 // Full-detail grid, shared by history rows and the verify result
 function detailsHTML(t) {
@@ -211,14 +259,6 @@ function detailsHTML(t) {
     ${t.hash ? `<a class="etherscan-link" href="${ETHERSCAN}${t.hash}" target="_blank" rel="noopener">View on Etherscan ↗</a>` : ""}`;
 }
 
-// Expand / collapse a row
-txList.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-toggle]");
-    if (!btn) return;
-    expandedHash = expandedHash === btn.dataset.toggle ? null : btn.dataset.toggle;
-    renderHistory();
-});
-filterSel.addEventListener("change", renderHistory);
 
 
 /* ---------- 1. Verify a transaction ---------- */
