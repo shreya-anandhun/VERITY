@@ -1556,10 +1556,11 @@ input[type="datetime-local"].field { color-scheme: dark; }
     position: fixed;
     inset: 0;
     z-index: 200;
-    background: #FFFFFF;
+    background: #1B2428 radial-gradient(60rem circle at 50% 40%, rgba(187, 255, 216, 0.10), transparent 60%);
     display: grid;
     place-items: center;
 }
+:root[data-theme="light"] .splash { background: #FFFFFF; }
 .splash-brand {
     display: flex;
     align-items: center;
@@ -1568,10 +1569,12 @@ input[type="datetime-local"].field { color-scheme: dark; }
     font-weight: 600;
     font-size: clamp(2.2rem, 7vw, 4rem);
     letter-spacing: 0.22em;
-    color: #111518;
+    color: #FFFFFF;
     animation: splashIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.splash-mark { width: 0.8em; height: 0.8em; fill: #7E4FD8; stroke: none; animation: splashSpin 1.4s ease-in-out infinite alternate; }
+:root[data-theme="light"] .splash-brand { color: #111518; }
+:root[data-theme="light"] .splash-mark { fill: #7E4FD8; }
+.splash-mark { width: 0.8em; height: 0.8em; fill: #BBFFD8; stroke: none; animation: splashSpin 1.4s ease-in-out infinite alternate; }
 @keyframes splashIn { from { opacity: 0; transform: translateY(14px); letter-spacing: 0.45em; } to { opacity: 1; transform: none; letter-spacing: 0.22em; } }
 @keyframes splashSpin { from { transform: rotate(0deg) scale(0.9); } to { transform: rotate(90deg) scale(1.05); } }
 
@@ -2031,3 +2034,15 @@ select.field {
 :root[data-theme="light"] .demo-step i { background: #EFE6FB; color: #5B2FB8; }
 :root[data-theme="light"] .demo-step a { color: #5B2FB8; }
 @media (max-width: 860px) { .demo-steps { grid-template-columns: 1fr; } }
+
+/* ===== 28. Phone: "open in Phantom" bar ===== */
+.phone-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 120; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px;
+    background: var(--surface); border: 1px solid var(--mint); box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6); font-size: 0.84rem; color: var(--text-dim); animation: popIn 0.4s ease both; }
+.phone-bar span { flex: 1; line-height: 1.35; }
+.phone-bar b { display: block; color: var(--white); font-weight: 500; }
+.phone-bar-btn { flex: none; padding: 10px 14px; border-radius: 999px; background: var(--mint); color: var(--surface); font-weight: 500; white-space: nowrap; }
+.phone-bar-x { flex: none; width: 28px; height: 28px; color: var(--text-dim); }
+:root[data-theme="light"] .phone-bar { border-color: #7E4FD8; box-shadow: 0 18px 40px -12px rgba(126, 79, 216, 0.45); }
+:root[data-theme="light"] .phone-bar-btn { background: #7E4FD8; color: #FFFFFF; }
+#connectNoExt a { color: var(--mint); text-decoration: underline; text-underline-offset: 3px; }
+:root[data-theme="light"] #connectNoExt a { color: #5B2FB8; }

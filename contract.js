@@ -74,6 +74,13 @@ async function queryEventsOnce(filter) {
 async function writeContract() {
     const provider = getProvider();
     if (!provider) throw new Error("Phantom not found");
+    // Safety: never send a vote on the wrong network (e.g. real Ethereum). Sepolia only.
+    let chain = await provider.request({ method: "eth_chainId" }).catch(() => null);
+    if (chain && Number(chain) !== 11155111) {
+        await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0xaa36a7" }] }).catch(() => {});
+        chain = await provider.request({ method: "eth_chainId" }).catch(() => null);
+        if (chain && Number(chain) !== 11155111) throw new Error("Your wallet isn't on the Sepolia test network. In Phantom: Settings, Developer Settings, turn on Testnet Mode, then try again.");
+    }
     const browserProvider = new ethers.BrowserProvider(provider);
     const signer = await browserProvider.getSigner();
     return new ethers.Contract(CONTRACT_ADDRESS, VOTING_ABI, signer);
@@ -123,6 +130,13 @@ async function loadPolls(force = false) {
         } catch (err) {}
     }
 
+    if (inflight) return inflight;                 // two parts of a page asking at once share one request
+    inflight = fetchPolls().finally(() => { inflight = null; });
+    return inflight;
+}
+let inflight = null;
+
+async function fetchPolls() {
     const raw = await withFailover(async () => {
         const count = Number(await readContract.pollCount());
         // Ask for every poll at once instead of one after another
@@ -142,28 +156,35 @@ async function loadPolls(force = false) {
         createdAt: created[i] || 0
     }));
 
-    // Creation times: only look up polls we haven't seen before (from PollCreated events)
-    if (polls.some((p) => !p.createdAt)) {
-        try {
-            const events = await queryEvents(readContract.filters.PollCreated());
-            const blocks = [...new Set(events.map((e) => e.blockNumber))];
-            const times = {};
-            await Promise.all(blocks.map(async (bn) => { times[bn] = (await readProvider.getBlock(bn)).timestamp * 1000; }));
-            for (const ev of events) {
-                const poll = polls[Number(ev.args.pollId)];
-                if (poll) { poll.createdAt = times[ev.blockNumber]; created[poll.id] = poll.createdAt; }
-            }
-            setSetting("created", created);
-        } catch (err) { console.log("Could not read creation times", err); }
-    }
-
     const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id));
+    savePolls(shown);
+
+    // Creation times need a slow search through old events. Don't make the page wait:
+    // show the polls now and fill the times in when they arrive.
+    if (polls.some((p) => !p.createdAt)) {
+        (async () => {
+            try {
+                const events = await queryEvents(readContract.filters.PollCreated());
+                const blocks = [...new Set(events.map((e) => e.blockNumber))];
+                const times = {};
+                await Promise.all(blocks.map(async (bn) => { times[bn] = await blockTime(bn); }));
+                for (const ev of events) {
+                    const poll = polls[Number(ev.args.pollId)];
+                    if (poll) { poll.createdAt = times[ev.blockNumber]; created[poll.id] = poll.createdAt; }
+                }
+                setSetting("created", created);
+                if (pollsCache === shown) { savePolls(shown); document.dispatchEvent(new Event("polls-fresh")); }
+            } catch (err) { console.log("Could not read creation times", err); }
+        })();
+    }
+    return shown;
+}
+function savePolls(shown) {
     pollsCache = shown;
     try {
         sessionStorage.setItem(POLL_CACHE, JSON.stringify({ time: Date.now(), polls: shown }));
         localStorage.setItem(POLL_LAST, JSON.stringify(shown));
     } catch (err) {}
-    return shown;
 }
 
 // Which option did this wallet pick in each poll? { pollId: optionIndex }
@@ -195,6 +216,10 @@ async function loadMyVoteTxs(address) {
 }
 
 
+// Start fetching the polls the moment this file loads, before the wallet check finishes
+loadPolls().catch(() => {});
+
+
 /* ---------- Pending + failed transactions (remembered in this browser) ---------- */
 // A reverted transaction leaves no event on-chain, so we note it here for the Transactions page.
 function rememberTx(list, tx) {
@@ -215,7 +240,7 @@ function friendlyError(err) {
     if (/insufficient funds/i.test(msg)) return "Not enough Sepolia ETH for the network fee";
     if (/Only the creator/i.test(msg)) return "Only the poll's creator can close it";
     if (/missing revert data|execution reverted|CALL_EXCEPTION/i.test(msg)) return "The network rejected this. Most likely this wallet already voted, or the poll has closed.";
-    return msg.length > 140 ? msg.slice(0, 140) + "…" : msg;
+    return msg.length > 170 ? msg.slice(0, 170) + "…" : msg;
 }
 
 

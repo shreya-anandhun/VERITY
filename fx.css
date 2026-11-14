@@ -33,7 +33,7 @@
 /* pinned to the page, not the screen: sparkles stay where they are when you scroll */
 body { position: relative; }
 .fx-sky { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-.fx-aurora { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; animation: fx-aurora 16s var(--ease-in-out) infinite alternate; }
+.fx-aurora { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; will-change: transform; animation: fx-aurora 16s var(--ease-in-out) infinite alternate; }
 .fx-aurora.a { width: 38rem; height: 38rem; right: -8rem; top: -10rem; background: var(--fx-soft); }
 .fx-aurora.b { width: 26rem; height: 26rem; left: 22%; bottom: -9rem; background: color-mix(in srgb, var(--fx) 22%, transparent); animation-delay: -5s; }
 .fx-aurora.c { width: 22rem; height: 22rem; left: 14rem; top: 28%; background: color-mix(in srgb, var(--fx-2) 20%, transparent); animation-delay: -9s; }
@@ -50,7 +50,8 @@ body { position: relative; }
     clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
     animation: fx-twinkle var(--t, 3s) var(--ease-in-out) infinite; animation-delay: calc(var(--d, 0s) * -1);
 }
-.fx-spark { filter: drop-shadow(0 0 6px var(--fx-glow)) drop-shadow(0 0 14px var(--fx-glow)); }
+/* (no blur filters on moving sparkles: they made scrolling stutter) */
+.fx-spark, .fx-spark i { will-change: transform, opacity; }
 @keyframes fx-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
 @keyframes fx-twinkle {
     0%, 100% { opacity: 0.25; transform: scale(0.6) rotate(0deg); }
@@ -79,7 +80,8 @@ body { position: relative; }
 .fx-card:hover { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--fx) 70%, transparent), 0 22px 44px -22px var(--fx-glow), 0 0 34px -10px var(--fx-glow) !important; }
 
 .fx-tilt { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
-    transition: transform 180ms var(--ease-out), box-shadow 0.3s, border-color 0.3s; will-change: transform; }
+    transition: transform 180ms var(--ease-out), box-shadow 0.3s, border-color 0.3s; }
+.fx-tilt:hover { will-change: transform; }
 .fx-tilt:active { transform: perspective(900px) scale(0.97); }
 /* the big number / icon lifts off the card */
 .fx-tilt > .num, .fx-tilt > b, .fx-tilt > i, .fx-tilt > h3, .fx-tilt .stat-btn { transition: transform 350ms var(--ease-out); }

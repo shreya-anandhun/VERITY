@@ -102,7 +102,7 @@
                 <h2>Scan to vote</h2>
                 <p>One wallet, one vote. Watch your vote land on the big screen.</p>
                 <p class="xp-url mono">${esc(url.replace(/^https?:\/\//, ""))}</p>
-                <p class="xp-help">No wallet? Install the Phantom app, switch it to Sepolia, and open this link inside it.</p>
+                <p class="xp-help">On a phone, tap “Open in Phantom” when the page loads. Phantom needs Testnet Mode on (Settings, Developer Settings).</p>
             </aside>`;
         document.body.appendChild(root);
         document.body.classList.add("x-noscroll");

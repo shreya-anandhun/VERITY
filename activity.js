@@ -77,8 +77,8 @@ async function loadHistory() {
         list.push({ hash: ev.transactionHash, type: "create", status: "confirmed", block: ev.blockNumber,
             poll: ev.args.title, option: null, time: 0 });
     }
-    await Promise.all(list.map(async (tx) => { tx.time = await blockTime(tx.block); }));
-    // Fees: read the receipt for each (cheap, only this wallet's)
+    // Times and fees are asked for together, not one after the other
+    const timesReady = Promise.all(list.map(async (tx) => { tx.time = await blockTime(tx.block); }));
     await Promise.all(list.map(async (tx) => {
         // A confirmed transaction's fee never changes, so remember it in this browser
         const fees = getSetting("fees", {});
@@ -91,6 +91,7 @@ async function loadHistory() {
             }
         } catch (err) {}
     }));
+    await timesReady;
 
     // Pending ones noted in this browser: still pending, or mined since?
     for (const ptx of getSetting("pending", [])) {
@@ -108,6 +109,15 @@ async function loadHistory() {
     }
 
     transactions = list;
+    // Remember it, so the next visit can show the timeline instantly
+    try { localStorage.setItem("verity-history", JSON.stringify({ who: me.toLowerCase(), list }, (k, v) => typeof v === "bigint" ? "n:" + v : v)); } catch (err) {}
+}
+function cachedHistory() {
+    try {
+        const c = JSON.parse(localStorage.getItem("verity-history"), (k, v) => typeof v === "string" && v.startsWith("n:") ? BigInt(v.slice(2)) : v);
+        if (c && currentAccount && c.who === currentAccount.toLowerCase()) return c.list;
+    } catch (err) {}
+    return null;
 }
 
 
@@ -115,6 +125,9 @@ async function loadHistory() {
 async function renderAll() {
     document.querySelector(".content").classList.remove("waiting");
     if (currentAccount) { emptyNotConn.classList.add("hidden"); historySection.classList.remove("hidden"); verifyForm.classList.remove("hidden"); emptyNoTx.classList.remove("hidden"); emptyNoTx.textContent = "Loading your activity from Sepolia…"; }
+    // Show what we saw last time straight away, then check the chain for anything new
+    const old = cachedHistory();
+    if (old && !transactions.length) { transactions = old; paint(); }
     try { await loadHistory(); }
     catch (err) { console.log("History load failed", err); toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad"); }
     document.querySelector(".content").classList.remove("waiting");

@@ -27,7 +27,7 @@ function setSetting(key, value) {
 }
 // Light or dark: sets data-theme on <html>, which style.css reads
 function applyTheme() {
-    let t = getSetting("theme", "light");
+    let t = getSetting("theme", "dark");
     if (t === "system") t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     document.documentElement.dataset.theme = t;
 }
@@ -364,12 +364,20 @@ function showDisconnected() {
     document.dispatchEvent(new CustomEvent("wallet-disconnected"));
 }
 
+// Phones: Safari and Chrome can't talk to a wallet app. The page has to be opened
+// INSIDE the Phantom app's own browser, and this link does exactly that.
+const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function phantomAppLink() {
+    return "https://phantom.app/ul/browse/" + encodeURIComponent(location.href) + "?ref=" + encodeURIComponent(location.origin);
+}
+
 async function connectWallet() {
     const provider = getProvider();
 
-    // No Phantom? Send them to install it.
+    // No wallet here? On a phone, reopen this page inside the Phantom app. On a computer, go and install it.
     if (!provider) {
-        window.open("https://phantom.com/download", "_blank");
+        if (isPhone) location.href = phantomAppLink();
+        else window.open("https://phantom.com/download", "_blank");
         return;
     }
 
@@ -435,6 +443,21 @@ function openConnectModal() {
     document.querySelectorAll("[data-wallet-name]").forEach((el) => el.textContent = name);
     document.getElementById("connectHave").classList.toggle("hidden", !installed);
     document.getElementById("connectNoExt").classList.toggle("hidden", installed);
+    if (!installed && isPhone) {
+        // On a phone the useful button is "open this page in the Phantom app"
+        const nw = document.getElementById("connectNew");
+        nw.href = phantomAppLink();
+        nw.removeAttribute("target");
+        nw.querySelector("strong").textContent = "Open VERITY in the Phantom app";
+        nw.querySelector("small").textContent = "Phone browsers can't reach your wallet. This reopens the page inside Phantom, where you can connect and vote.";
+        document.getElementById("connectNoExt").innerHTML = 'No Phantom app yet? <a href="https://phantom.com/download" target="_blank" rel="noopener">Get it free</a>, then scan the QR code again.';
+        const h = connectModal.querySelector("h2");
+        if (h) h.textContent = "Voting from your phone?";
+        const intro = connectModal.querySelector(".welcome-text");
+        if (intro) intro.textContent = "You have the Phantom app, but this browser can't see it. One tap fixes that.";
+        const bar = document.getElementById("phoneBar");
+        if (bar) bar.remove();
+    }
     profilePanel.classList.remove("open");
     connectModal.classList.remove("hidden");
 }
@@ -560,10 +583,27 @@ document.getElementById("welcomeConnect").addEventListener("click", () => {
 document.getElementById("welcomeLater").addEventListener("click", closeWelcome);
 } // end of Home-only welcome code
 
+// Phone browser with no wallet: a bar at the bottom offers to reopen the page in the Phantom app
+function showPhoneBar() {
+    if (!isPhone || getProvider() || document.getElementById("phoneBar")) return;
+    try { if (sessionStorage.getItem("verity-phonebar") === "1") return; } catch (err) {}
+    const bar = document.createElement("div");
+    bar.id = "phoneBar";
+    bar.className = "phone-bar";
+    bar.innerHTML = '<span><b>To vote on your phone</b>open this page inside the Phantom app.</span>' +
+        '<a class="phone-bar-btn" href="' + phantomAppLink() + '">Open in Phantom</a>' +
+        '<button class="phone-bar-x" aria-label="Dismiss">✕</button>';
+    bar.querySelector("button").addEventListener("click", () => {
+        bar.remove();
+        try { sessionStorage.setItem("verity-phonebar", "1"); } catch (err) {}
+    });
+    document.body.appendChild(bar);
+}
+
 // If they connected before, show it straight away (no popup)
 (async () => {
     const provider = getProvider();
-    if (!provider) { walletReady = true; document.dispatchEvent(new Event("wallet-ready")); return; }
+    if (!provider) { walletReady = true; document.dispatchEvent(new Event("wallet-ready")); setTimeout(showPhoneBar, 600); return; }
 
     // Did they press Disconnect last time? Then stay disconnected.
     let forgot = false;
