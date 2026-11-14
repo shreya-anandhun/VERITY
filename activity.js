@@ -110,7 +110,7 @@ async function renderAll() {
     document.querySelector(".content").classList.remove("waiting");
     if (currentAccount) { emptyNotConn.classList.add("hidden"); historySection.classList.remove("hidden"); verifyForm.classList.remove("hidden"); emptyNoTx.classList.remove("hidden"); emptyNoTx.textContent = "Loading your activity from Sepolia…"; }
     try { await loadHistory(); }
-    catch (err) { console.log("History load failed", err); toast("Couldn't reach the Sepolia network. Check your connection.", "bad"); }
+    catch (err) { console.log("History load failed", err); toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad"); }
     document.querySelector(".content").classList.remove("waiting");
     paint();
 }

@@ -17,12 +17,16 @@ const VOTING_ABI = [
     "event PollClosed(uint256 indexed pollId)"
 ];
 
+// Polls hidden from the site (they still exist on-chain; nothing can delete them).
+// Add a poll's ID here to stop VERITY showing it anywhere.
+const HIDDEN_POLLS = [3];
+
 // Public Sepolia nodes for READING (works even with no wallet connected).
 // We talk to one node at a time; if it errors, we move to the next in the list.
 const SEPOLIA_RPCS = [
     "https://ethereum-sepolia-rpc.publicnode.com",
-    "https://sepolia.drpc.org",
-    "https://rpc.sepolia.org"
+    "https://1rpc.io/sepolia",
+    "https://sepolia.gateway.tenderly.co"
 ];
 const SEPOLIA_NET = { chainId: 11155111, name: "sepolia" };
 let rpcIndex = 0;
@@ -285,7 +289,7 @@ async function loadHome() {
         updateCountdown();
     } catch (err) {
         console.log("Home load failed", err);
-        toast("Couldn't reach the Sepolia network. Check your connection.", "bad");
+        toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
 }
 loadHome();

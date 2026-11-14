@@ -47,7 +47,7 @@ async function loadLive() {
         myVoteTxs = await loadMyVoteTxs(currentAccount);
     } catch (err) {
         console.log("Live polls load failed", err);
-        toast("Couldn't reach the Sepolia network. Check your connection.", "bad");
+        toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
     ranked = [...livePolls].sort((a, b) => pollTotal(b) - pollTotal(a));
     if (openId !== null && !livePolls.some((p) => p.id === openId)) openId = null;   // not live (any more)
