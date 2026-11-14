@@ -25,8 +25,8 @@ const HIDDEN_POLLS = [3];
 // We talk to one node at a time; if it errors, we move to the next in the list.
 const SEPOLIA_RPCS = [
     "https://ethereum-sepolia-rpc.publicnode.com",
-    "https://1rpc.io/sepolia",
-    "https://sepolia.gateway.tenderly.co"
+    "https://sepolia.gateway.tenderly.co",
+    "https://1rpc.io/sepolia"
 ];
 const SEPOLIA_NET = { chainId: 11155111, name: "sepolia" };
 let rpcIndex = 0;
@@ -43,9 +43,9 @@ async function withFailover(fn) {
     for (let attempt = 0; ; attempt++) {
         try { return await fn(); }
         catch (err) {
-            if (rpcIndex >= SEPOLIA_RPCS.length - 1 || attempt >= 2) throw err;
+            if (attempt >= SEPOLIA_RPCS.length) throw err;
             console.log("RPC failed, switching node:", err.shortMessage || err.message);
-            useRpc(rpcIndex + 1);
+            useRpc((rpcIndex + 1) % SEPOLIA_RPCS.length);   // go round the list, back to the first if needed
         }
     }
 }
@@ -62,7 +62,9 @@ async function queryEventsOnce(filter) {
     const STEP = 49000;
     const all = [];
     for (let from = DEPLOY_BLOCK; from <= latest; from += STEP + 1) {
-        const to = Math.min(from + STEP, latest);
+        // For the newest chunk ask up to "latest" by name: public nodes sit behind a load
+        // balancer, and one that is a block behind rejects a block number it hasn't seen yet
+        const to = from + STEP >= latest ? "latest" : from + STEP;
         all.push(...await readContract.queryFilter(filter, from, to));
     }
     return all;
