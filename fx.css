@@ -1,0 +1,155 @@
+/* ==========================================================================
+   fx.css - VERITY's motion + decor layer (ported from Block by Block)
+   Floating sparkles, glowing cards with a 3D tilt, and hover definitions.
+   Everything switches off for people who ask their device to reduce motion.
+   ========================================================================== */
+:root {
+    --fx: #BBFFD8;                 /* glow colour (dark theme: mint) */
+    --fx-2: #8FB6FF;
+    --fx-ink: #111518;
+    --fx-soft: rgba(187, 255, 216, 0.16);
+    --fx-glow: rgba(187, 255, 216, 0.45);
+    --fx-paper: #151B1E;
+    --fx-text: #E8EEEB;
+    --fx-faint: #8A9590;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+:root[data-theme="light"] {
+    --fx: #7E4FD8;                 /* light theme: royal purple */
+    --fx-2: #C2A8F0;
+    --fx-ink: #FFFFFF;
+    --fx-soft: rgba(126, 79, 216, 0.14);
+    --fx-glow: rgba(126, 79, 216, 0.5);
+    --fx-paper: #FFFFFF;
+    --fx-text: #111518;
+    --fx-faint: #8B8F98;
+}
+@property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes border-spin { to { --angle: 360deg; } }
+@keyframes fx-spin { to { transform: rotate(360deg); } }
+
+/* ---------- 1. Sky: drifting glow + twinkling, floating sparkles ---------- */
+.fx-sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.fx-aurora { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; animation: fx-aurora 16s var(--ease-in-out) infinite alternate; }
+.fx-aurora.a { width: 38rem; height: 38rem; right: -8rem; top: -10rem; background: var(--fx-soft); }
+.fx-aurora.b { width: 26rem; height: 26rem; left: 22%; bottom: -9rem; background: color-mix(in srgb, var(--fx) 22%, transparent); animation-delay: -5s; }
+.fx-aurora.c { width: 22rem; height: 22rem; left: 14rem; top: 28%; background: color-mix(in srgb, var(--fx-2) 20%, transparent); animation-delay: -9s; }
+@keyframes fx-aurora {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(-3rem, 2rem) scale(1.12); }
+    100% { transform: translate(2rem, -2rem) scale(0.95); }
+}
+/* the sparkle floats (translate) while its star twinkles (transform), so the two never fight */
+.fx-spark { position: absolute; left: var(--x); top: var(--y); animation: fx-float var(--f, 7s) var(--ease-in-out) infinite; animation-delay: calc(var(--d) * -1); }
+.fx-spark i, .spark {
+    display: block; width: calc(20px * var(--s, 1)); height: calc(20px * var(--s, 1));
+    background: var(--fx);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+    animation: fx-twinkle var(--t, 3s) var(--ease-in-out) infinite; animation-delay: calc(var(--d, 0s) * -1);
+}
+.fx-spark { filter: drop-shadow(0 0 6px var(--fx-glow)) drop-shadow(0 0 14px var(--fx-glow)); }
+@keyframes fx-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
+@keyframes fx-twinkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.6) rotate(0deg); }
+    50%      { opacity: 1;    transform: scale(1.1) rotate(45deg); }
+}
+/* Home's own sparkles join in */
+.content.home .spark { fill: none; filter: drop-shadow(0 0 8px var(--fx-glow)); }
+.content.home .spark use { display: none; }
+.content.home .spark.s2 { --d: 1.1s; --t: 2.7s; } .content.home .spark.s3 { --d: 2.2s; --t: 3.8s; }
+.content.home .spark.s4 { --d: 0.6s; } .content.home .spark.s5 { --d: 1.7s; --t: 3.4s; }
+.hero-title svg { animation: fx-pulse 3.2s var(--ease-in-out) infinite; transform-origin: center; }
+@keyframes fx-pulse { 0%, 100% { transform: scale(0.92); } 50% { transform: scale(1.1); } }
+
+/* ---------- 2. Cards: gentle bob, 3D tilt, pointer spotlight, glow ---------- */
+.fx-bob { animation: fx-bob 7s var(--ease-in-out) infinite; }
+.fx-bob:nth-child(2n) { animation-delay: -2.3s; }
+.fx-bob:nth-child(3n) { animation-delay: -4.6s; animation-duration: 8s; }
+.fx-bob:hover, .fx-bob:focus-within { animation-play-state: paused; }
+@keyframes fx-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -7px; } }
+
+.fx-card { position: relative; isolation: isolate; }
+.fx-spot { position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0;
+    background: radial-gradient(16rem circle at var(--gx, 50%) var(--gy, 0%), var(--fx-soft), transparent 62%);
+    transition: opacity 350ms var(--ease-out); }
+.fx-card:hover > .fx-spot { opacity: 1; }
+.fx-card:hover { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--fx) 70%, transparent), 0 22px 44px -22px var(--fx-glow), 0 0 34px -10px var(--fx-glow) !important; }
+
+.fx-tilt { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
+    transition: transform 180ms var(--ease-out), box-shadow 0.3s, border-color 0.3s; will-change: transform; }
+.fx-tilt:active { transform: perspective(900px) scale(0.97); }
+/* the big number / icon lifts off the card */
+.fx-tilt > .num, .fx-tilt > b, .fx-tilt > i, .fx-tilt > h3, .fx-tilt .stat-btn { transition: transform 350ms var(--ease-out); }
+.fx-tilt:hover > .num, .fx-tilt:hover > b, .fx-tilt:hover > i { transform: translateZ(26px); }
+.fx-tilt:hover > h3 { transform: translateZ(14px); }
+.fx-tilt:hover .stat-btn { transform: translateZ(18px); }
+
+/* a slow turning light around the featured tile (same trick as Block by Block's badge) */
+:root[data-theme="light"] .hstat.accent {
+    border: 1.5px solid transparent;
+    background:
+        linear-gradient(130deg, #EFE6FB 0%, #F7F2FD 55%, #FFFFFF 100%) padding-box,
+        conic-gradient(from var(--angle, 0deg), #7E4FD8, transparent 30%, #C2A8F0 55%, transparent 78%, #7E4FD8) border-box;
+    animation: border-spin 6s linear infinite, fx-bob 7s var(--ease-in-out) infinite;
+}
+:root:not([data-theme="light"]) .hstat:not(.accent), :root:not([data-theme="light"]) .hhow {
+    border: 1.5px solid transparent;
+    background:
+        linear-gradient(#111518, #111518) padding-box,
+        conic-gradient(from var(--angle, 0deg), #BBFFD8, transparent 30%, #8FB6FF 55%, transparent 78%, #BBFFD8) border-box;
+    animation: border-spin 6s linear infinite, fx-bob 7s var(--ease-in-out) infinite;
+}
+
+/* buttons: press in, and a shine sweeps the main one */
+.btn-primary, .btn-ghost, .vote-btn, .small-btn, .stat-btn, .connect-btn { transition-property: transform, box-shadow, background, color, border-color; }
+.btn-primary:active, .btn-ghost:active, .vote-btn:active, .small-btn:active, .connect-btn:active { transform: scale(0.96); }
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+    transform: translateX(-120%); animation: fx-shine 3.2s var(--ease-in-out) infinite; }
+@keyframes fx-shine { 60%, 100% { transform: translateX(120%); } }
+
+/* cards rise in as each page opens */
+.fx-in { animation: fx-in 600ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes fx-in { from { opacity: 0; transform: translateY(14px) scale(0.96); } }
+
+/* ---------- 3. Hover definitions ---------- */
+.tip { position: relative; cursor: help; color: inherit; font-weight: 600; border-radius: 4px; padding-inline: 0.1em;
+    background:
+        linear-gradient(var(--fx), var(--fx)) no-repeat left bottom / 100% 2px,
+        linear-gradient(color-mix(in srgb, var(--fx) 30%, transparent), color-mix(in srgb, var(--fx) 30%, transparent)) no-repeat left bottom / 0% 100%;
+    transition: background-size 300ms var(--ease-out), color 150ms; }
+.tip::after { content: "✦"; position: absolute; top: -0.7em; right: -0.45em; font-size: 0.6em; color: var(--fx);
+    opacity: 0; transform: scale(0.3) rotate(-60deg); transition: opacity 150ms, transform 350ms var(--ease-out); pointer-events: none; }
+.tip:hover, .tip.is-open, .tip:focus-visible { background-size: 100% 2px, 100% 100%; color: var(--fx-text); outline: none; }
+.tip:hover::after, .tip.is-open::after { opacity: 1; transform: scale(1) rotate(0deg); }
+
+.tipbubble { position: fixed; z-index: 400; width: max-content; max-width: min(19rem, calc(100vw - 24px));
+    padding: 0.85rem 1rem 0.7rem; border-radius: 18px; background: transparent; isolation: isolate;
+    border: 1.5px solid var(--fx); text-align: left;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--fx) 16%, transparent), 0 24px 50px -18px rgba(0, 0, 0, 0.45), 0 0 40px -10px var(--fx-glow);
+    pointer-events: none; opacity: 0; transform: translateY(8px) scale(0.9); filter: blur(4px);
+    transition: opacity 180ms var(--ease-out), transform 260ms var(--ease-out), filter 200ms var(--ease-out); }
+.tipbubble[data-side="bottom"] { transform: translateY(-8px) scale(0.9); }
+.tipbubble.is-on { opacity: 1; transform: none; filter: none; }
+.tipbubble::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 17px; background: var(--fx-paper); }
+.tipbubble__ring { position: absolute; inset: -1.5px; z-index: -2; border-radius: 18px; filter: blur(6px); opacity: 0.7;
+    background: conic-gradient(from var(--angle, 0deg), var(--fx), transparent 30%, var(--fx-2) 55%, transparent 80%, var(--fx));
+    animation: border-spin 3s linear infinite; }
+.tipbubble__head { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.3rem; }
+.tipbubble__head svg { width: 0.95rem; height: 0.95rem; color: var(--fx); animation: fx-spin 4s linear infinite; }
+.tipbubble__head strong { font-family: var(--font-head); font-size: 1rem; font-weight: 600; color: var(--fx); }
+.tipbubble p { margin: 0; font-size: 0.86rem; line-height: 1.5; color: var(--fx-text); }
+.tipbubble__foot { display: block; margin-top: 0.45rem; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fx-faint); }
+.tipbubble__arrow { position: absolute; width: 12px; height: 12px; margin-left: -6px; background: var(--fx-paper); border: 1.5px solid var(--fx); transform: rotate(45deg); }
+.tipbubble[data-side="top"] .tipbubble__arrow { bottom: -7px; border-top: 0; border-left: 0; }
+.tipbubble[data-side="bottom"] .tipbubble__arrow { top: -7px; border-bottom: 0; border-right: 0; }
+
+@media (max-width: 860px) { .fx-aurora.c { display: none; } .fx-tilt { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+    .fx-aurora, .fx-spark, .fx-spark i, .spark, .fx-bob, .fx-in, .hero-title svg, .btn-primary::after,
+    .hstat, .hhow, .tipbubble__ring, .tipbubble__head svg { animation: none !important; }
+    .fx-spark i, .spark { opacity: 0.7; }
+    .fx-tilt { transform: none !important; }
+}
