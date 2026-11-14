@@ -211,42 +211,55 @@ function render() {
     buildRail();
 }
 
-/* ---------- Scroll rail: a diamond per poll, down the right edge ---------- */
-// Shows there are more polls below, lights up the one you're looking at, and jumps on click.
+/* ---------- Scroll rail: shows how far down the page you are ---------- */
+// One diamond per row of polls. The lit diamond follows the scroll position (top = first,
+// bottom = last), and clicking a diamond jumps to that row.
 const rail = document.createElement("nav");
 rail.className = "scroll-rail hidden";
-rail.setAttribute("aria-label", "Jump to a poll");
+rail.setAttribute("aria-label", "Jump to a row of polls");
 document.body.appendChild(rail);
+let railRows = [];
 function buildRail() {
+    // group the cards into rows by their top edge (the grid has 2 columns on wide screens)
     const cards = [...grid.querySelectorAll(".live-card")];
+    railRows = [];
+    cards.forEach((c) => {
+        const top = Math.round(c.offsetTop);
+        const row = railRows.find((r) => Math.abs(r.top - top) < 40);
+        if (row) row.cards.push(c); else railRows.push({ top, cards: [c] });
+    });
+    railRows.sort((a, b) => a.top - b.top);
     const scrollable = document.documentElement.scrollHeight > window.innerHeight + 40;
-    rail.classList.toggle("hidden", cards.length < 2 || !scrollable);
-    rail.innerHTML = cards.map((c, i) => `<button data-jump="${i}" aria-label="Go to poll ${i + 1} of ${cards.length}"><i></i></button>`).join("") +
+    rail.classList.toggle("hidden", railRows.length < 2 || !scrollable);
+    rail.innerHTML = railRows.map((r, i) => `<button data-jump="${i}" aria-label="Go to row ${i + 1} of ${railRows.length}"><i></i></button>`).join("") +
         '<span class="rail-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>scroll</span>';
     markRail();
 }
 function markRail() {
-    const cards = [...grid.querySelectorAll(".live-card")];
-    if (!cards.length) return;
-    const mid = window.innerHeight / 2;
-    let best = 0, bestDist = Infinity;
-    cards.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        const d = Math.abs((r.top + r.bottom) / 2 - mid);
-        if (d < bestDist) { bestDist = d; best = i; }
-    });
-    rail.querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === best));
-    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 30;
-    rail.classList.toggle("at-end", atBottom);
+    if (!railRows.length) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    const active = Math.round(progress * (railRows.length - 1));
+    rail.querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === active));
+    rail.classList.toggle("at-end", progress > 0.97);
 }
 rail.addEventListener("click", (e) => {
     const b = e.target.closest("[data-jump]");
     if (!b) return;
-    const card = grid.querySelectorAll(".live-card")[Number(b.dataset.jump)];
-    if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    const i = Number(b.dataset.jump);
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    // same scale as the indicator: first diamond = top, last = bottom, the rest evenly in between
+    window.scrollTo({ top: Math.round(max * i / Math.max(1, railRows.length - 1)), behavior: "smooth" });
 });
-window.addEventListener("scroll", markRail, { passive: true });
+let railTick = false;
+window.addEventListener("scroll", () => {
+    if (railTick) return;
+    railTick = true;
+    requestAnimationFrame(() => { railTick = false; markRail(); });
+}, { passive: true });
 window.addEventListener("resize", buildRail);
+// cards change height as they slide in and as results load: re-measure once things settle
+setTimeout(buildRail, 900);
 
 if (walletReady) loadLive(); else document.addEventListener("wallet-ready", loadLive, { once: true });
 document.addEventListener("wallet-connected", loadLive);

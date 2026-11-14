@@ -578,9 +578,27 @@ function closeWelcome() {
 
 document.getElementById("welcomeConnect").addEventListener("click", () => {
     closeWelcome();
+    // Once the wallet connects from here, offer the demo (same popup, step 3)
+    let offered = false;
+    try { offered = localStorage.getItem("verity-tour-offered") === "1"; } catch (err) {}
+    if (!offered) document.addEventListener("wallet-connected", offerTour, { once: true });
     openConnectModal();
 });
 document.getElementById("welcomeLater").addEventListener("click", closeWelcome);
+
+function offerTour() {
+    try { localStorage.setItem("verity-tour-offered", "1"); } catch (err) {}   // ask once per device
+    const name = getName();
+    document.getElementById("welcomeTourTitle").textContent = name ? `You're all set, ${name}!` : "You're all set!";
+    document.getElementById("welcomeStep1").classList.add("hidden");
+    document.getElementById("welcomeStep2").classList.add("hidden");
+    document.getElementById("welcomeStep3").classList.remove("hidden");
+    setTimeout(() => welcomeModal.classList.remove("hidden"), 350);            // let the connect popup close first
+}
+document.getElementById("welcomeTourNo").addEventListener("click", () => {
+    welcomeModal.classList.add("hidden");
+    document.getElementById("welcomeStep3").classList.add("hidden");
+});
 } // end of Home-only welcome code
 
 // Phone browser with no wallet: a bar at the bottom offers to reopen the page in the Phantom app
