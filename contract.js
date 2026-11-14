@@ -115,9 +115,10 @@ async function loadPolls(force = false) {
         } catch (err) { console.log("Could not read creation times", err); }
     }
 
-    pollsCache = polls;
-    try { sessionStorage.setItem(POLL_CACHE, JSON.stringify({ time: Date.now(), polls })); } catch (err) {}
-    return polls;
+    const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id));
+    pollsCache = shown;
+    try { sessionStorage.setItem(POLL_CACHE, JSON.stringify({ time: Date.now(), polls: shown })); } catch (err) {}
+    return shown;
 }
 
 // Which option did this wallet pick in each poll? { pollId: optionIndex }
@@ -238,7 +239,7 @@ async function fillProfile(address) {
         if (list) {
             list.innerHTML = voted
                 ? Object.entries(mine).slice(-5).reverse().map(([id, opt]) => {
-                    const p = polls[Number(id)];
+                    const p = polls.find((x) => x.id === Number(id)) || { question: "Poll #" + id, options: [] };
                     return `<li><span class="muted">${escapeHTML(p.question)}</span><br>${escapeHTML(p.options[opt])}</li>`;
                 }).join("")
                 : '<li class="muted">No votes yet</li>';

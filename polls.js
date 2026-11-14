@@ -20,6 +20,7 @@ const isMine = (p) => currentAccount && p.creator.toLowerCase() === currentAccou
 
 function whenText(p) {
     if (isLive(p)) return "Ends in " + formatTimeLeft(p.endTime - Date.now()).replace(/ \d\ds$/, "");
+    if (!p.isOpen && p.endTime > Date.now()) return "Closed by creator";
     return "Ended " + new Date(p.endTime).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 }
 function creatorText(p) {

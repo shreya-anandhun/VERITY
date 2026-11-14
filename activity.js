@@ -69,7 +69,7 @@ async function loadHistory() {
         queryEvents(readContract.filters.PollCreated(null, me))
     ]);
     for (const ev of votedEvs) {
-        const p = polls[Number(ev.args.pollId)];
+        const p = polls.find((x) => x.id === Number(ev.args.pollId));
         list.push({ hash: ev.transactionHash, type: "vote", status: "confirmed", block: ev.blockNumber,
             poll: p ? p.question : `Poll #${ev.args.pollId}`, option: p ? p.options[Number(ev.args.optionIndex)] : "", time: 0 });
     }
@@ -249,9 +249,9 @@ verifyForm.addEventListener("submit", async (e) => {
             let parsed = null;
             try { parsed = readContract.interface.parseLog(log); } catch (err) {}
             if (!parsed) continue;
-            if (parsed.name === "Voted") { const p = polls[Number(parsed.args.pollId)]; t.type = "vote"; t.poll = p ? p.question : `Poll #${parsed.args.pollId}`; t.option = p ? p.options[Number(parsed.args.optionIndex)] : ""; }
+            if (parsed.name === "Voted") { const p = polls.find((x) => x.id === Number(parsed.args.pollId)); t.type = "vote"; t.poll = p ? p.question : `Poll #${parsed.args.pollId}`; t.option = p ? p.options[Number(parsed.args.optionIndex)] : ""; }
             if (parsed.name === "PollCreated") { t.type = "create"; t.poll = parsed.args.title; }
-            if (parsed.name === "PollClosed") { const p = polls[Number(parsed.args.pollId)]; t.type = "create"; t.poll = (p ? p.question : `Poll #${parsed.args.pollId}`) + " (closed)"; }
+            if (parsed.name === "PollClosed") { const p = polls.find((x) => x.id === Number(parsed.args.pollId)); t.type = "create"; t.poll = (p ? p.question : `Poll #${parsed.args.pollId}`) + " (closed)"; }
         }
         if (t.status === "failed") t.reason = "The network rejected this transaction";
         verifyResult.innerHTML = `
