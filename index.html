@@ -121,7 +121,7 @@
         </header>
 
         <!-- Content -->
-        <section class="content">
+        <section class="content home">
 
             <!-- 0. WHAT IS VERITY -->
             <div class="intro-card">
@@ -194,16 +194,30 @@
             <!-- Shown instead of the poll card when nothing is live -->
             <div class="empty-poll" id="emptyPoll">Loading from Sepolia…</div>
 
-            <!-- 3. LIVE POLLS COUNT -->
-            <a href="live.html" class="count-card">
-                <div>
-                    <p class="count-number"><span id="liveCount">0</span> <span id="liveWord">polls</span> live</p>
-                    <p class="count-sub">Browse every open poll and cast your vote</p>
-                </div>
-                <span class="count-arrow">
-                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-            </a>
+            <!-- 3. LIVE NUMBERS FROM THE CHAIN -->
+            <div class="home-stats">
+                <a href="live.html" class="stat-card accent">
+                    <b id="liveCount">0</b>
+                    <small><span id="liveWord">polls</span> live</small>
+                    <span class="stat-sub">Browse every open poll</span>
+                </a>
+                <a href="polls.html" class="stat-card">
+                    <b id="totalVotes">0</b>
+                    <small>votes on-chain</small>
+                    <span class="stat-sub"><span id="totalPolls">0</span> polls so far</span>
+                </a>
+            </div>
+
+            <!-- 4. HOW IT WORKS, IN BRIEF -->
+            <div class="home-how">
+                <h3>How it works</h3>
+                <ol>
+                    <li>Connect your wallet</li>
+                    <li>Vote once per poll</li>
+                    <li>Verify it on Etherscan</li>
+                </ol>
+                <a class="how-link" href="how-it-works.html">Read the full story →</a>
+            </div>
         </section>
 
         <!-- Footer -->

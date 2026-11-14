@@ -253,6 +253,8 @@ async function loadHome() {
         const live = polls.filter((p) => p.isOpen && p.endTime > Date.now());
         livePollCount = live.length;
         setText("liveCount", live.length);
+        setText("totalPolls", polls.length);
+        setText("totalVotes", polls.reduce((n, p) => n + p.totalVotes, 0).toLocaleString("en-IN"));
         setText("liveWord", live.length === 1 ? "poll" : "polls");
 
         if (!live.length) {

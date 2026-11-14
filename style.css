@@ -31,10 +31,12 @@ body {
     color: var(--white);
     font-family: var(--font-body);
     min-height: 100vh;
-    /* faint diagonal light lines across the page, like the reference */
-    background-image:
-        radial-gradient(circle at 85% -10%, rgba(187, 255, 216, 0.07), transparent 45%),
-        repeating-linear-gradient(115deg, transparent 0 46px, rgba(187, 255, 216, 0.025) 46px 47px);
+    /* Wallpaper: the wallet card's line-art waves and sparkles, fixed behind every page */
+    background-image: url("wallpaper-dark.svg");
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -1357,11 +1359,8 @@ input[type="datetime-local"].field { color-scheme: dark; }
     --mint: #7E4FD8;                        /* light mode accent is purple, not mint */
     --lavender: #5B2FB8;
 }
-:root[data-theme="light"] body {
-    background-image:
-        radial-gradient(circle at 85% -10%, rgba(50, 55, 104, 0.08), transparent 45%),
-        repeating-linear-gradient(115deg, transparent 0 46px, rgba(17, 21, 24, 0.035) 46px 47px);
-}
+:root[data-theme="light"] { --bg: #F6F7FB; }
+:root[data-theme="light"] body { background-image: url("wallpaper-light.svg"); }
 :root[data-theme="light"] .nav-item.active { background: rgba(126, 79, 216, 0.35); color: #5B2FB8; }
 :root[data-theme="light"] .nav-item:hover { background: rgba(17, 21, 24, 0.05); }
 :root[data-theme="light"] .profile-panel,
@@ -1696,3 +1695,68 @@ select.field {
 }
 .pp-signout { display: block; width: 100%; margin-top: 10px; font-size: 0.8rem; color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
 .pp-signout:hover { color: #ff8a8a; }
+
+
+/* ---------- 21. Home bento grid ---------- */
+.content.home {
+    max-width: 1040px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+        "intro intro"
+        "wallet stats"
+        "poll how";
+    gap: 22px;
+    align-items: stretch;
+}
+.content.home .intro-card { grid-area: intro; }
+.content.home .wallet-card { grid-area: wallet; aspect-ratio: auto; min-height: 300px; }
+.home-stats { grid-area: stats; display: grid; grid-template-rows: 1fr 1fr; gap: 22px; }
+.content.home .poll-card, .content.home #emptyPoll { grid-area: poll; }
+.home-how { grid-area: how; }
+.stat-card {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 6px;
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--white);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+.stat-card:hover { box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 28px rgba(187, 255, 216, 0.10); }
+:root[data-theme="light"] .stat-card:hover { border-color: #7E4FD8; box-shadow: 0 0 0 1.5px rgba(126, 79, 216, 0.7), 0 8px 32px rgba(126, 79, 216, 0.3); }
+.stat-card b { font-family: var(--font-head); font-weight: 600; font-size: 2.4rem; line-height: 1; color: var(--mint); }
+:root[data-theme="light"] .stat-card b { color: #7E4FD8; }
+.stat-card small { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+.stat-card .stat-sub { font-size: 0.82rem; color: var(--text-dim); margin-top: 2px; }
+.stat-card.accent { background: linear-gradient(120deg, #C8FEDA 0%, #C8FEDA 38%, var(--surface) 82%); }
+.stat-card.accent b, .stat-card.accent small, .stat-card.accent .stat-sub { color: var(--surface); }
+:root[data-theme="light"] .stat-card.accent { background: linear-gradient(120deg, #EFE6FB 0%, #EFE6FB 38%, #FFFFFF 82%); }
+:root[data-theme="light"] .stat-card.accent b { color: #5B2FB8; }
+:root[data-theme="light"] .stat-card.accent small, :root[data-theme="light"] .stat-card.accent .stat-sub { color: rgba(17, 21, 24, 0.6); }
+.home-how {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--white);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+.home-how:hover { box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 28px rgba(187, 255, 216, 0.10); }
+:root[data-theme="light"] .home-how:hover { border-color: #7E4FD8; box-shadow: 0 0 0 1.5px rgba(126, 79, 216, 0.7), 0 8px 32px rgba(126, 79, 216, 0.3); }
+.home-how h3 { font-family: var(--font-head); font-weight: 500; font-size: 1.05rem; }
+.home-how ol { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text-dim); }
+.home-how ol li::before { content: counter(step) " · "; counter-increment: step; color: var(--mint); font-weight: 600; }
+:root[data-theme="light"] .home-how ol li::before { color: #7E4FD8; }
+.home-how ol { counter-reset: step; }
+.home-how .how-link { font-size: 0.85rem; color: var(--mint); }
+:root[data-theme="light"] .home-how .how-link { color: #5B2FB8; }
+@media (max-width: 1000px) {
+    .content.home { grid-template-columns: 1fr; grid-template-areas: "intro" "wallet" "stats" "poll" "how"; }
+    .home-stats { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+    .content.home .wallet-card { min-height: 270px; }
+}
+@media (max-width: 860px) {
+    body { background-attachment: scroll; background-size: 180% auto; }
+}
