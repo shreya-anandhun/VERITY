@@ -50,6 +50,24 @@ async function withFailover(fn) {
     }
 }
 
+// The block the contract was deployed in: no events exist before it
+const DEPLOY_BLOCK = 12120000;
+
+// Public nodes only allow 50,000 blocks per event query, so we ask in chunks
+async function queryEvents(filter) {
+    return withFailover(() => queryEventsOnce(filter));
+}
+async function queryEventsOnce(filter) {
+    const latest = await readProvider.getBlockNumber();
+    const STEP = 49000;
+    const all = [];
+    for (let from = DEPLOY_BLOCK; from <= latest; from += STEP + 1) {
+        const to = Math.min(from + STEP, latest);
+        all.push(...await readContract.queryFilter(filter, from, to));
+    }
+    return all;
+}
+
 // Contract connected to Phantom, for WRITING (vote, create, close)
 async function writeContract() {
     const provider = getProvider();
