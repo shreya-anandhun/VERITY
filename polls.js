@@ -114,6 +114,16 @@ function render() {
         render();
     };
     rows.innerHTML = list.map((p) => {
+        if (p.pending) {
+            return `
+            <article class="poll-row live pending-row">
+                <div class="row-main">
+                    <span class="status-pill pending"><span class="live-dot"></span> Confirming</span>
+                    <span class="row-text"><strong>${escapeHTML(p.question)}</strong><small><span class="cat-chip">${p.category}</span> · by You · ${p.options.length} options · waiting for the block</small></span>
+                    <span class="row-right"><span class="row-votes">0 <em>votes</em></span><span class="row-when">${whenText(p)}</span></span>
+                </div>
+            </article>`;
+        }
         const live = isLive(p);
         const inner = `
             <span class="status-pill ${live ? "confirmed" : "ended"}">${live ? '<span class="live-dot"></span> Live' : "Ended"}</span>
@@ -296,7 +306,15 @@ createForm.addEventListener("submit", (e) => {
         const category = cfCategory.value;
         try {
             const r = await sendTx("create", { poll: question, option: null },
-                (c) => c.createPoll(question, category, options, Math.floor(endTime / 1000)));
+                (c) => c.createPoll(question, category, options, Math.floor(endTime / 1000)),
+                () => {
+                    // Show it straight away while Sepolia confirms it
+                    allPolls.unshift({ id: "pending", question, category, options, votes: options.map(() => 0),
+                        creator: currentAccount, createdAt: Date.now(), endTime, isOpen: true, totalVotes: 0, pending: true });
+                    statusSel.value = "all"; sortSel.value = "newest";
+                    render();
+                    toast("Poll sent to Sepolia. Confirming… (about 15 seconds)", "");
+                });
             if (r) { toast("Poll created on Sepolia ✓", "good"); statusSel.value = "mine"; sortSel.value = "newest"; }
         } catch (err) { toast(err.message, "bad"); }
         await loadAll();

@@ -18,32 +18,32 @@ const VOTING_ABI = [
 ];
 
 // Public Sepolia nodes for READING (works even with no wallet connected).
-// If the first one is slow or rate-limited, ethers moves to the next.
+// We talk to one node at a time; if it errors, we move to the next in the list.
 const SEPOLIA_RPCS = [
     "https://ethereum-sepolia-rpc.publicnode.com",
     "https://sepolia.drpc.org",
     "https://rpc.sepolia.org"
 ];
 const SEPOLIA_NET = { chainId: 11155111, name: "sepolia" };
-const readProvider = new ethers.FallbackProvider(
-    SEPOLIA_RPCS.map((url, i) => ({ provider: new ethers.JsonRpcProvider(url, SEPOLIA_NET, { staticNetwork: true }), priority: i + 1, stallTimeout: 2500, weight: 1 })),
-    SEPOLIA_NET, { quorum: 1 }
-);
-const readContract = new ethers.Contract(CONTRACT_ADDRESS, VOTING_ABI, readProvider);
-
-// The block the contract was deployed in: no events exist before it
-const DEPLOY_BLOCK = 12120000;
-
-// Public nodes only allow 50,000 blocks per event query, so we ask in chunks
-async function queryEvents(filter) {
-    const latest = await readProvider.getBlockNumber();
-    const STEP = 49000;
-    const all = [];
-    for (let from = DEPLOY_BLOCK; from <= latest; from += STEP + 1) {
-        const to = Math.min(from + STEP, latest);
-        all.push(...await readContract.queryFilter(filter, from, to));
+let rpcIndex = 0;
+let readProvider, readContract;
+function useRpc(i) {
+    rpcIndex = i;
+    readProvider = new ethers.JsonRpcProvider(SEPOLIA_RPCS[i], SEPOLIA_NET, { staticNetwork: true });
+    readProvider.pollingInterval = 2000;          // notice confirmations sooner (default is 4s)
+    readContract = new ethers.Contract(CONTRACT_ADDRESS, VOTING_ABI, readProvider);
+}
+useRpc(0);
+// Run a read; if the node fails, switch to the next one and try again
+async function withFailover(fn) {
+    for (let attempt = 0; ; attempt++) {
+        try { return await fn(); }
+        catch (err) {
+            if (rpcIndex >= SEPOLIA_RPCS.length - 1 || attempt >= 2) throw err;
+            console.log("RPC failed, switching node:", err.shortMessage || err.message);
+            useRpc(rpcIndex + 1);
+        }
     }
-    return all;
 }
 
 // Contract connected to Phantom, for WRITING (vote, create, close)
@@ -81,9 +81,11 @@ async function loadPolls(force = false) {
         if (c) { pollsCache = c; return c; }
     }
 
-    const count = Number(await readContract.pollCount());
-    // Ask for every poll at once instead of one after another
-    const raw = await Promise.all(Array.from({ length: count }, (_, i) => readContract.getPoll(i)));
+    const raw = await withFailover(async () => {
+        const count = Number(await readContract.pollCount());
+        // Ask for every poll at once instead of one after another
+        return Promise.all(Array.from({ length: count }, (_, i) => readContract.getPoll(i)));
+    });
     const created = getSetting("created", {});
     const polls = raw.map((p, i) => ({
         id: i,
@@ -122,8 +124,8 @@ async function loadPolls(force = false) {
 async function loadMyVotes(address, polls) {
     const mine = {};
     if (!address) return mine;
-    const flags = await Promise.all(polls.map((p) => readContract.hasVoted(p.id, address)));
-    const picks = await Promise.all(polls.map((p, i) => flags[i] ? readContract.votedFor(p.id, address) : null));
+    const flags = await withFailover(() => Promise.all(polls.map((p) => readContract.hasVoted(p.id, address))));
+    const picks = await withFailover(() => Promise.all(polls.map((p, i) => flags[i] ? readContract.votedFor(p.id, address) : null)));
     polls.forEach((p, i) => { if (flags[i]) mine[p.id] = Number(picks[i]); });
     return mine;
 }
@@ -171,7 +173,7 @@ function friendlyError(err) {
 /* ---------- Send a transaction and track it ---------- */
 // kind: "vote" | "create" | "close".  info: { poll, option }
 // Returns the receipt, or null if the user cancelled. Throws on revert.
-async function sendTx(kind, info, call) {
+async function sendTx(kind, info, call, onSent) {
     let tx;
     try {
         const contract = await writeContract();
@@ -186,8 +188,10 @@ async function sendTx(kind, info, call) {
     myVoteTxCache = { address: null, map: {} };
     rememberTx("pending", { hash: tx.hash, type: kind, poll: info.poll, option: info.option, time: Date.now() });
     document.dispatchEvent(new CustomEvent("verity-tx", { detail: { hash: tx.hash, kind } }));
+    if (onSent) { try { onSent(tx.hash); } catch (err) {} }
 
-    const receipt = await tx.wait();
+    // Wait for the block through our own node (polls every 2s), not the wallet's
+    const receipt = await readProvider.waitForTransaction(tx.hash, 1, 180000);
     forgetTx("pending", tx.hash);
     clearPollCache();                                             // numbers changed
     if (receipt.status !== 1) {

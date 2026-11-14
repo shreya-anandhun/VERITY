@@ -1729,7 +1729,7 @@ select.field {
 :root[data-theme="light"] .stat-card b { color: #7E4FD8; }
 .stat-card small { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
 .stat-card .stat-sub { font-size: 0.82rem; color: var(--text-dim); margin-top: 2px; }
-.stat-card.accent { background: linear-gradient(120deg, #C8FEDA 0%, #C8FEDA 38%, var(--surface) 82%); }
+.stat-card.accent { background: linear-gradient(120deg, #C8FEDA 0%, #C8FEDA 55%, #9FE8BF 100%); }
 .stat-card.accent b, .stat-card.accent small, .stat-card.accent .stat-sub { color: var(--surface); }
 :root[data-theme="light"] .stat-card.accent { background: linear-gradient(120deg, #EFE6FB 0%, #EFE6FB 38%, #FFFFFF 82%); }
 :root[data-theme="light"] .stat-card.accent b { color: #5B2FB8; }
@@ -1760,3 +1760,6 @@ select.field {
 @media (max-width: 860px) {
     body { background-attachment: scroll; background-size: 180% auto; }
 }
+
+.pending-row { border-style: dashed; opacity: 0.85; }
+.pending-row .row-main { cursor: default; }

@@ -246,7 +246,8 @@ document.getElementById("confirmYes").addEventListener("click", async () => {
     render();
     try {
         const receipt = await sendTx("vote", { poll: poll.question, option: poll.options[optionIndex] },
-            (c) => c.vote(pollId, optionIndex));
+            (c) => c.vote(pollId, optionIndex),
+            () => toast("Vote sent to Sepolia. Confirming… (about 15 seconds)", ""));
         if (receipt) toast("Vote recorded on Sepolia ✓", "good");
     } catch (err) {
         toast(err.message, "bad");
