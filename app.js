@@ -510,16 +510,28 @@ function showWelcomeIfNeeded() {
     // Wait until we know whether Phantom is already connected
     if (walletReady) decide(); else document.addEventListener("wallet-ready", decide, { once: true });
 }
+// Home boxes slide in from the sides every time the page is shown
+function animateHome() {
+    const home = document.querySelector(".content.home");
+    if (!home) return;
+    home.classList.remove("enter");
+    void home.offsetWidth;                                 // restart the animation
+    home.classList.add("enter");
+}
 if (splash && !seenSplash) {
     try { sessionStorage.setItem("verity-splash", "1"); } catch (err) {}
     setTimeout(() => {
         splash.classList.add("out");                       // swoosh animation
+        animateHome();
         setTimeout(() => { splash.remove(); showWelcomeIfNeeded(); }, 750);
     }, 1400);
 } else {
     if (splash) splash.remove();
+    animateHome();
     showWelcomeIfNeeded();
 }
+// Also replay when coming back via the browser's back/forward cache
+window.addEventListener("pageshow", (e) => { if (e.persisted) animateHome(); });
 
 document.getElementById("nameForm").addEventListener("submit", (e) => {
     e.preventDefault();                       // stop the page reloading
