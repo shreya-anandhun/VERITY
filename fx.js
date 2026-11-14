@@ -31,13 +31,29 @@
     /* ---------- 2. Cards ---------- */
     // tilt + bob: tile-like cards.  glow only: cards full of controls (a moving form is annoying)
     var TILT = ".hstat, .hhow, .act-tile, .demo-step, .live-card:not(.expanded)";
-    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .flow-step, .create-bar";
+    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .flow-step";
     var BOB  = ".hstat, .hhow, .act-tile, .demo-step, .live-card:not(.expanded)";
+
+    // For the first few seconds after a page opens, every box slides in from the sides
+    // (later refreshes, like Live Polls updating every 15 s, don't replay it)
+    var opening = true, slideCount = 0;
+    setTimeout(function () { opening = false; }, 4000);
+    var isHome = !!document.querySelector(".content.home");      // Home has its own entrance
 
     function dress(root) {
         root.querySelectorAll(TILT + "," + GLOW).forEach(function (el, i) {
             if (el.classList.contains("fx-card")) return;
             el.classList.add("fx-card");
+            if (opening && !isHome && !reduce.matches) {
+                var n = slideCount++;
+                el.style.setProperty("--from", n % 2 ? "translateX(48px)" : "translateX(-48px)");
+                el.style.setProperty("--i", Math.min(n, 10));
+                el.classList.add("fx-slide");
+                el.addEventListener("animationend", function done(e) {
+                    if (e.animationName !== "fx-slide") return;
+                    el.classList.remove("fx-slide"); el.removeEventListener("animationend", done);
+                });
+            }
             if (el.matches(TILT)) el.classList.add("fx-tilt");
             if (el.matches(BOB)) el.classList.add("fx-bob");
             var spot = document.createElement("span");

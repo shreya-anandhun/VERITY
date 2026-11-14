@@ -30,7 +30,9 @@
 @keyframes fx-spin { to { transform: rotate(360deg); } }
 
 /* ---------- 1. Sky: drifting glow + twinkling, floating sparkles ---------- */
-.fx-sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+/* pinned to the page, not the screen: sparkles stay where they are when you scroll */
+body { position: relative; }
+.fx-sky { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 .fx-aurora { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; animation: fx-aurora 16s var(--ease-in-out) infinite alternate; }
 .fx-aurora.a { width: 38rem; height: 38rem; right: -8rem; top: -10rem; background: var(--fx-soft); }
 .fx-aurora.b { width: 26rem; height: 26rem; left: 22%; bottom: -9rem; background: color-mix(in srgb, var(--fx) 22%, transparent); animation-delay: -5s; }
@@ -110,9 +112,10 @@
     transform: translateX(-120%); animation: fx-shine 3.2s var(--ease-in-out) infinite; }
 @keyframes fx-shine { 60%, 100% { transform: translateX(120%); } }
 
-/* cards rise in as each page opens */
-.fx-in { animation: fx-in 600ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
-@keyframes fx-in { from { opacity: 0; transform: translateY(14px) scale(0.96); } }
+/* every box slides in from the sides as a page opens (same move as Home) */
+.fx-slide { animation: fx-slide 0.6s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.fx-slide.fx-bob { animation: fx-slide 0.6s var(--ease-out) both, fx-bob 7s var(--ease-in-out) infinite; animation-delay: calc(var(--i, 0) * 70ms), 0s; }
+@keyframes fx-slide { from { opacity: 0; transform: var(--from, translateY(20px)); } }
 
 /* ---------- 3. Hover definitions ---------- */
 .tip { position: relative; cursor: help; color: inherit; font-weight: 600; border-radius: 4px; padding-inline: 0.1em;
@@ -148,8 +151,9 @@
 
 @media (max-width: 860px) { .fx-aurora.c { display: none; } .fx-tilt { transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-    .fx-aurora, .fx-spark, .fx-spark i, .spark, .fx-bob, .fx-in, .hero-title svg, .btn-primary::after,
+    .fx-aurora, .fx-spark, .fx-spark i, .spark, .fx-bob, .fx-slide, .hero-title svg, .btn-primary::after,
     .hstat, .hhow, .tipbubble__ring, .tipbubble__head svg { animation: none !important; }
     .fx-spark i, .spark { opacity: 0.7; }
     .fx-tilt { transform: none !important; }
 }
+.poll-rows.fresh .poll-row.fx-slide { animation: fx-slide 0.6s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
