@@ -14,7 +14,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#EEF2F0">
     <link rel="stylesheet" href="style.css">
-    <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("verity-theme"))||"light"}catch(e){}</script>
+    <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"light";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
 
@@ -103,20 +103,16 @@
             </div>
         </header>
 
-        <section class="content settings">
-
-            <!-- 1. THEME -->
+        <section class="content content-wide settings">
+            <div class="set-cols">
+            <div class="set-col">
+            <!-- 1. APPEARANCE -->
             <div class="set-group">
-                <h2 class="set-title">Theme</h2>
+                <h2 class="set-title">Appearance</h2>
                 <div class="theme-pick" id="themePick">
-                    <button class="theme-opt" data-theme="dark">
-                        <span class="theme-swatch dark"><i></i><i></i></span>
-                        Dark
-                    </button>
-                    <button class="theme-opt" data-theme="light">
-                        <span class="theme-swatch light"><i></i><i></i></span>
-                        Light
-                    </button>
+                    <button class="theme-opt" data-theme="light">Light</button>
+                    <button class="theme-opt" data-theme="dark">Dark</button>
+                    <button class="theme-opt" data-theme="system">System</button>
                 </div>
             </div>
 
@@ -124,78 +120,74 @@
             <div class="set-group">
                 <h2 class="set-title">Notifications</h2>
                 <label class="set-row">
-                    <span>
-                        <strong>Alert me when a poll I voted in ends</strong>
-                        <small>A small message appears on VERITY with the result. Nothing is sent to your email or phone.</small>
-                    </span>
+                    <span><strong>Poll I voted in ends</strong><small>In-app message with the result</small></span>
                     <input type="checkbox" class="switch" id="notifEnds">
                 </label>
                 <label class="set-row">
-                    <span>
-                        <strong>Alert me when a poll I created gets its first vote</strong>
-                        <small>Only shown while you're on the site.</small>
-                    </span>
+                    <span><strong>My poll gets its first vote</strong><small>Only while you're on the site</small></span>
                     <input type="checkbox" class="switch" id="notifFirst">
                 </label>
             </div>
 
             <!-- 3. VOTING -->
             <div class="set-group">
-                <h2 class="set-title">Voting confirmation</h2>
+                <h2 class="set-title">Voting</h2>
                 <label class="set-row">
-                    <span>
-                        <strong>Ask me to confirm before every vote</strong>
-                        <small>Shows a "Yes, cast my vote" popup first. Turn it off for one-tap voting. Your wallet will still ask you to sign either way.</small>
-                    </span>
+                    <span><strong>Confirm before every vote</strong><small>Your wallet still asks you to sign</small></span>
                     <input type="checkbox" class="switch" id="confirmVotes">
                 </label>
+                <label class="set-row">
+                    <span><strong>Show results before I vote</strong><small>Off by default to avoid bandwagon effects</small></span>
+                    <input type="checkbox" class="switch" id="showResults">
+                </label>
+            </div>
             </div>
 
-            <!-- 4. NETWORK & ADVANCED -->
+            <div class="set-col">
+            <!-- 4. CONTRACT & TRUST -->
+            <div class="set-group trust-group">
+                <h2 class="set-title kicker">Contract &amp; trust</h2>
+                <div class="set-row static">
+                    <span><strong>Voting contract</strong><small class="mono" id="contractAddr">—</small></span>
+                    <button class="small-btn" id="copyAddr">Copy</button>
+                </div>
+                <div class="set-row static">
+                    <span><strong>Source code</strong><small>On Etherscan · Solidity 0.8</small></span>
+                    <a class="small-btn" id="contractLink" href="#" target="_blank" rel="noopener">View ↗</a>
+                </div>
+                <div class="set-row static">
+                    <span><strong>Admin controls</strong><small>None. No owner, no pause, no upgrade.</small></span>
+                    <span class="status-pill confirmed">✓ Immutable</span>
+                </div>
+                <div class="set-row static">
+                    <span><strong>Network</strong><small>Ethereum Sepolia testnet</small></span>
+                    <span class="status-pill pending">Testnet</span>
+                </div>
+            </div>
+
+            <!-- 5. YOUR DATA -->
             <div class="set-group">
-                <h2 class="set-title">Network &amp; advanced</h2>
+                <h2 class="set-title">Your data</h2>
                 <div class="set-row static">
-                    <span>
-                        <strong>Network</strong>
-                        <small>Where VERITY's votes are recorded</small>
-                    </span>
-                    <span class="net-badge"><span class="network-dot"></span> Ethereum Sepolia <em>Testnet</em></span>
+                    <span><strong>Stored on this device</strong><small>Display name, theme, these toggles. Nothing on our servers.</small></span>
+                    <button class="small-btn" id="clearData">Clear</button>
                 </div>
                 <div class="set-row static">
-                    <span>
-                        <strong>Voting contract</strong>
-                        <small class="mono" id="contractAddr">—</small>
-                    </span>
-                    <span class="row-btns">
-                        <button class="small-btn" id="copyAddr">Copy</button>
-                        <a class="small-btn" id="contractLink" href="#" target="_blank" rel="noopener">Etherscan ↗</a>
-                    </span>
-                </div>
-                <div class="set-row static">
-                    <span>
-                        <strong>Wallet</strong>
-                        <small id="setWallet">Not connected</small>
-                    </span>
+                    <span><strong>Wallet</strong><small id="setWallet">Not connected</small></span>
                     <button class="small-btn" id="setWalletBtn">Connect</button>
                 </div>
             </div>
 
-            <!-- 5. ABOUT -->
+            <!-- 6. ABOUT -->
             <div class="set-group">
                 <h2 class="set-title">About</h2>
                 <div class="set-row static">
-                    <span><strong>Version</strong><small>VERITY 1.0 · Beta</small></span>
-                </div>
-                <div class="set-row static">
-                    <span><strong>Help</strong><small>verity.helpdesk@gmail.com</small></span>
-                    <a class="small-btn" href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Help">Email us</a>
-                </div>
-                <div class="set-row static">
-                    <span><strong>Something broken?</strong><small>Tell us what happened and we'll look into it.</small></span>
+                    <span><strong>VERITY 1.1 · Beta</strong><small>verity.helpdesk@gmail.com</small></span>
                     <a class="small-btn danger" href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report">Report an issue</a>
                 </div>
             </div>
-
+            </div>
+            </div>
             <p class="set-note">Your settings are saved only in this browser. VERITY never collects personal details.</p>
         </section>
 

@@ -36,6 +36,22 @@ function pct(part, total) { return total ? Math.round((part / total) * 100) : 0;
 /* ---------- Build the grid ---------- */
 const grid = document.getElementById("pollGrid");
 let ranked = [];
+let sortMode = "votes";
+function rankPolls() {
+    const r = [...livePolls];
+    if (sortMode === "ending") r.sort((a, b) => a.endTime - b.endTime);
+    else if (sortMode === "newest") r.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0) || b.id - a.id);
+    else r.sort((a, b) => pollTotal(b) - pollTotal(a));
+    return r;
+}
+document.getElementById("sortTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sort]");
+    if (!b) return;
+    sortMode = b.dataset.sort;
+    document.querySelectorAll("#sortTabs .tab").forEach((t) => t.classList.toggle("on", t === b));
+    ranked = rankPolls();
+    render();
+});
 let openId = null;   // which poll is expanded right now
 let sending = null;  // pollId while a vote is being confirmed by the network
 
@@ -49,7 +65,8 @@ async function loadLive() {
         console.log("Live polls load failed", err);
         toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
-    ranked = [...livePolls].sort((a, b) => pollTotal(b) - pollTotal(a));
+    ranked = rankPolls();
+    setText("pageSub", `${livePolls.length} live · updates every 15 s`);
     if (openId !== null && !livePolls.some((p) => p.id === openId)) openId = null;   // not live (any more)
     document.body.classList.toggle("poll-open", openId !== null);
     document.querySelector(".content").classList.remove("waiting");
@@ -68,22 +85,43 @@ function render() {
 
         // Collapsed card
         if (!isOpen) {
+            const showBars = voted !== undefined || getSetting("showResults", false);
+            const meta = `${p.category || "Other"} · by ${currentAccount && p.creator && p.creator.toLowerCase() === currentAccount.toLowerCase() ? "You" : shortAddress(p.creator || "0x0000000000000000000000000000000000000000")} · ${p.options.length} options · <b>${total.toLocaleString("en-IN")} ${total === 1 ? "vote" : "votes"}</b>`;
+            if (voted !== undefined) {
+                // Already voted: show the result right here
+                const bars = p.options.map((opt, i) => `
+                    <div class="mini-row"><span>${escapeHTML(opt)}${voted === i ? ' <b class="mine-tag">· your choice</b>' : ""}</span><span>${pct(p.votes[i], total)}%</span></div>
+                    <div class="mini-bar"><i style="width:${pct(p.votes[i], total)}%" class="${voted === i ? "mine" : ""}"></i></div>`).join("");
+                return `
+                <article class="poll-card live-card voted-card" data-id="${p.id}">
+                    <div class="poll-top">
+                        <span class="live-pill voted"><span class="live-dot"></span> You voted</span>
+                        <span class="time-left">ends in <b data-end="${p.endTime}">${formatTimeLeft(p.endTime - Date.now())}</b></span>
+                    </div>
+                    <h3 class="poll-question">${escapeHTML(p.question)}</h3>
+                    <p class="card-meta">${meta}</p>
+                    <div class="mini-bars">${bars}</div>
+                    <div class="card-actions">
+                        <a class="small-btn" href="${myVoteTxs[p.id] ? "https://sepolia.etherscan.io/tx/" + myVoteTxs[p.id] : "https://sepolia.etherscan.io/address/" + CONTRACT_ADDRESS}" target="_blank" rel="noopener">Receipt ↗</a>
+                        <button class="small-btn" data-share="${p.id}">Share</button>
+                        <button class="small-btn" data-report="${p.id}">Report</button>
+                    </div>
+                </article>`;
+            }
             return `
             <article class="poll-card live-card" data-id="${p.id}">
                 <div class="poll-top">
                     <span class="live-pill"><span class="live-dot"></span> LIVE</span>
-                    <span class="time-left">Time left <b data-end="${p.endTime}">${formatTimeLeft(p.endTime - Date.now())}</b></span>
+                    <span class="time-left">ends in <b data-end="${p.endTime}">${formatTimeLeft(p.endTime - Date.now())}</b></span>
                 </div>
                 <h3 class="poll-question">${escapeHTML(p.question)}</h3>
+                <p class="card-meta">${meta}</p>
                 <div class="poll-bottom">
-                    <button class="vote-btn" data-open="${p.id}" aria-label="${voted !== undefined ? "View your vote on" : "Vote on"}: ${escapeHTML(p.question)}">
-                        ${voted !== undefined ? "View your vote" : "Vote now"}
+                    <button class="vote-btn" data-open="${p.id}" aria-label="Vote on: ${escapeHTML(p.question)}">
+                        Vote
                         <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                     </button>
-                    <span class="voters">
-                        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
-                        <span>${total.toLocaleString("en-IN")}</span> voted
-                    </span>
+                    <span class="muted why-line">${showBars ? "Results are shown" : 'Results shown after you vote · <a href="how-it-works.html">why?</a>'}</span>
                 </div>
             </article>`;
         }
@@ -92,10 +130,10 @@ function render() {
         const optionsHTML = p.options.map((opt, i) => {
             const percent = pct(p.votes[i], total);
             const mine = voted === i;
-            const showBars = voted !== undefined;
+            const showBars = voted !== undefined || getSetting("showResults", false);
             return `
-            <button class="option ${showBars ? "has-result locked" : ""} ${mine ? "mine" : ""}"
-                    data-vote="${i}" aria-label="${showBars ? "Result: " : "Vote for "}${escapeHTML(opt)}" ${showBars ? 'aria-disabled="true"' : ""}>
+            <button class="option ${showBars ? "has-result" : ""} ${voted !== undefined ? "locked" : ""} ${mine ? "mine" : ""}"
+                    data-vote="${i}" aria-label="${voted !== undefined ? "Result: " : "Vote for "}${escapeHTML(opt)}" ${voted !== undefined ? 'aria-disabled="true"' : ""}>
                 <span class="option-fill" style="width:${showBars ? percent : 0}%"></span>
                 <span class="option-row">
                     <span class="option-text">${escapeHTML(opt)}${mine ? '<span class="your-choice">Your choice</span>' : ""}</span>
@@ -150,6 +188,8 @@ function render() {
 }
 if (walletReady) loadLive(); else document.addEventListener("wallet-ready", loadLive, { once: true });
 document.addEventListener("wallet-connected", loadLive);
+// Quiet refresh from the chain every 15 s (not while a vote is confirming)
+setInterval(() => { if (sending === null && !document.querySelector(".welcome-backdrop:not(.hidden)")) { clearPollCache(); loadLive(); } }, 15000);
 document.addEventListener("wallet-disconnected", loadLive);
 
 
@@ -163,6 +203,12 @@ grid.addEventListener("click", (e) => {
     if (openBtn)  { openPoll(Number(openBtn.dataset.open)); return; }
     if (closeBtn) { closePoll(); return; }
     if (repBtn)   { openReport(Number(repBtn.dataset.report)); return; }
+    const shareBtn = e.target.closest("[data-share]");
+    if (shareBtn) {
+        const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "live.html?poll=" + shareBtn.dataset.share;
+        copyText(url).then((ok) => toast(ok ? "Link copied" : url, ok ? "good" : ""));
+        return;
+    }
     if (voteBtn) {
         if (voteBtn.classList.contains("locked")) { toast("You've already voted in this poll. Votes can't be changed.", ""); return; }
         if (sending !== null) { toast("Hold on, your vote is still being confirmed.", ""); return; }

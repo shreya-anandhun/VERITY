@@ -14,7 +14,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#EEF2F0">
     <link rel="stylesheet" href="style.css">
-    <script>try{document.documentElement.dataset.theme=JSON.parse(localStorage.getItem("verity-theme"))||"light"}catch(e){}</script>
+    <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"light";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
 
@@ -105,14 +105,22 @@
 
         <section class="content content-wide">
             <div class="page-intro">
-                <p class="page-sub" id="pageSub">Sorted by popularity · tap a poll to vote</p>
+                <div class="sort-tabs" id="sortTabs">
+                    <button class="tab on" data-sort="votes">Most voted</button>
+                    <button class="tab" data-sort="ending">Ending soon</button>
+                    <button class="tab" data-sort="newest">Newest</button>
+                </div>
+                <p class="page-sub" id="pageSub">Loading…</p>
                 <span class="wallet-chip" id="walletChip">
                     <span class="status-dot dim"></span> Wallet not connected
                 </span>
             </div>
 
             <!-- Poll cards get drawn here by live.js -->
-            <div class="poll-grid" id="pollGrid"></div>
+            <div class="poll-grid" id="pollGrid">
+                <div class="poll-card skeleton"><span class="sk w1"></span><span class="sk w3"></span><span class="sk w2"></span></div>
+                <div class="poll-card skeleton"><span class="sk w1"></span><span class="sk w3"></span><span class="sk w2"></span></div>
+            </div>
 
             <div class="empty-poll" id="emptyLive">Loading polls from Sepolia…</div>
         </section>

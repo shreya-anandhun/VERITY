@@ -18,7 +18,7 @@ themePick.addEventListener("click", (e) => {
 markTheme();
 
 /* Toggles: each switch is saved under its own key */
-const switches = { notifEnds: true, notifFirst: true, confirmVotes: true };   // key -> default
+const switches = { notifEnds: true, notifFirst: true, confirmVotes: true, showResults: false };   // key -> default
 Object.entries(switches).forEach(([id, def]) => {
     const el = document.getElementById(id);
     el.checked = getSetting(id, def);
@@ -27,7 +27,7 @@ Object.entries(switches).forEach(([id, def]) => {
 
 /* Contract address + copy */
 document.getElementById("contractAddr").textContent = CONTRACT_ADDRESS;
-document.getElementById("contractLink").href = "https://sepolia.etherscan.io/address/" + CONTRACT_ADDRESS;
+document.getElementById("contractLink").href = "https://sepolia.etherscan.io/address/" + CONTRACT_ADDRESS + "#code";
 document.getElementById("copyAddr").addEventListener("click", async (e) => {
     const btn = e.currentTarget;
     const ok = await copyText(CONTRACT_ADDRESS);
@@ -46,3 +46,13 @@ setWalletBtn.addEventListener("click", () => currentAccount ? disconnectWallet()
 document.addEventListener("wallet-connected", renderWallet);
 document.addEventListener("wallet-disconnected", renderWallet);
 renderWallet();
+
+/* Clear everything VERITY keeps on this device (name, theme, toggles, local history notes) */
+document.getElementById("clearData").addEventListener("click", () => {
+    if (!confirm("Clear your display name, theme and settings on this device? Your on-chain votes are not affected.")) return;
+    try {
+        Object.keys(localStorage).filter((k) => k.startsWith("verity-")).forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+    } catch (err) {}
+    location.reload();
+});

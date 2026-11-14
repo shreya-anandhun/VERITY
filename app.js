@@ -27,9 +27,12 @@ function setSetting(key, value) {
 }
 // Light or dark: sets data-theme on <html>, which style.css reads
 function applyTheme() {
-    document.documentElement.dataset.theme = getSetting("theme", "light");
+    let t = getSetting("theme", "light");
+    if (t === "system") t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
 }
 applyTheme();
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
 
 
 /* ---------- 1. Sidebar toggle (phones) ---------- */
