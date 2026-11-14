@@ -211,7 +211,7 @@ drawCardWaves();
 const pollCard  = document.getElementById("featuredPoll");
 const emptyPoll = document.getElementById("emptyPoll");
 
-if (pollCard) {
+if (pollCard && emptyPoll) {
     if (!featuredPoll) {
         pollCard.classList.add("hidden");
         emptyPoll.classList.remove("hidden");

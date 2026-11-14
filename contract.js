@@ -274,7 +274,7 @@ document.addEventListener("wallet-connected", (e) => fillProfile(e.detail.addres
 /* ---------- Home page ---------- */
 async function loadHome() {
     const pollCard = document.getElementById("featuredPoll");
-    if (!pollCard) return;
+    if (!pollCard && !document.getElementById("liveCount")) return;
     try {
         const polls = await loadPolls();
         const live = polls.filter((p) => p.isOpen && p.endTime > Date.now());
@@ -284,6 +284,7 @@ async function loadHome() {
         setText("totalVotes", polls.reduce((n, p) => n + p.totalVotes, 0).toLocaleString("en-IN"));
         setText("liveWord", live.length === 1 ? "poll" : "polls");
 
+        if (!pollCard) return;                       // Home no longer shows a featured poll
         if (!live.length) {
             featuredPoll = null;
             pollCard.classList.add("hidden");
