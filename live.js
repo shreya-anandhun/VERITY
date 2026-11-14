@@ -52,6 +52,16 @@ document.getElementById("sortTabs").addEventListener("click", (e) => {
     ranked = rankPolls();
     render();
 });
+// Search box: filter the live polls by question, option or category
+let searchText = "";
+document.getElementById("liveSearch").addEventListener("input", (e) => {
+    searchText = e.target.value.trim().toLowerCase();
+    render();
+});
+function matchesSearch(p) {
+    if (!searchText) return true;
+    return (p.question + " " + p.options.join(" ") + " " + (p.category || "")).toLowerCase().includes(searchText);
+}
 let openId = null;   // which poll is expanded right now
 let sending = null;  // pollId while a vote is being confirmed by the network
 
@@ -60,7 +70,12 @@ async function loadLive() {
         const all = await loadPolls();
         livePolls = all.filter((p) => p.isOpen && p.endTime > Date.now());
         myVotes = await loadMyVotes(currentAccount, livePolls);
-        myVoteTxs = await loadMyVoteTxs(currentAccount);
+        // Receipt links need an event search, which is slow: fill them in afterwards
+        loadMyVoteTxs(currentAccount).then((m) => {
+            const changed = JSON.stringify(m) !== JSON.stringify(myVoteTxs);
+            myVoteTxs = m;
+            if (changed && sending === null && !document.querySelector(".welcome-backdrop:not(.hidden), .x-backdrop")) render();
+        });
     } catch (err) {
         console.log("Live polls load failed", err);
         toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
@@ -74,10 +89,16 @@ async function loadLive() {
 }
 
 function render() {
-    document.getElementById("emptyLive").classList.toggle("hidden", ranked.length > 0);
-    if (!ranked.length) { grid.innerHTML = ""; return; }
+    const shown = ranked.filter((p) => matchesSearch(p) || p.id === openId);
+    const empty = document.getElementById("emptyLive");
+    empty.classList.toggle("hidden", shown.length > 0);
+    if (!shown.length) {
+        empty.textContent = ranked.length ? "No live polls match your search" : "No polls currently live";
+        grid.innerHTML = ""; buildRail(); return;
+    }
+    const tools = (id) => `<span class="card-tools"><button class="tool-btn" data-recount="${id}" title="Count the votes yourself, straight from the blockchain">Recount</button><button class="tool-btn" data-present="${id}" title="Full-screen view with a QR code, for a projector">Present</button></span>`;
 
-    grid.innerHTML = ranked.map((p) => {
+    grid.innerHTML = shown.map((p) => {
         const total = pollTotal(p);
         const isOpen = p.id === openId;
         const voted = myVotes[p.id];               // undefined if not voted
@@ -105,6 +126,7 @@ function render() {
                         <a class="small-btn" href="${myVoteTxs[p.id] ? "https://sepolia.etherscan.io/tx/" + myVoteTxs[p.id] : "https://sepolia.etherscan.io/address/" + CONTRACT_ADDRESS}" target="_blank" rel="noopener">Receipt ↗</a>
                         <button class="small-btn" data-share="${p.id}">Share</button>
                         <button class="small-btn" data-report="${p.id}">Report</button>
+                        ${tools(p.id)}
                     </div>
                 </article>`;
             }
@@ -123,6 +145,7 @@ function render() {
                     </button>
                     <span class="muted why-line">${showBars ? "Results are shown" : 'Results shown after you vote · <a href="how-it-works.html">why?</a>'}</span>
                 </div>
+                <div class="card-actions tools-only">${tools(p.id)}</div>
             </article>`;
         }
 
@@ -185,11 +208,51 @@ function render() {
             </button>
         </article>`;
     }).join("");
+    buildRail();
 }
+
+/* ---------- Scroll rail: a diamond per poll, down the right edge ---------- */
+// Shows there are more polls below, lights up the one you're looking at, and jumps on click.
+const rail = document.createElement("nav");
+rail.className = "scroll-rail hidden";
+rail.setAttribute("aria-label", "Jump to a poll");
+document.body.appendChild(rail);
+function buildRail() {
+    const cards = [...grid.querySelectorAll(".live-card")];
+    const scrollable = document.documentElement.scrollHeight > window.innerHeight + 40;
+    rail.classList.toggle("hidden", cards.length < 2 || !scrollable);
+    rail.innerHTML = cards.map((c, i) => `<button data-jump="${i}" aria-label="Go to poll ${i + 1} of ${cards.length}"><i></i></button>`).join("") +
+        '<span class="rail-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>scroll</span>';
+    markRail();
+}
+function markRail() {
+    const cards = [...grid.querySelectorAll(".live-card")];
+    if (!cards.length) return;
+    const mid = window.innerHeight / 2;
+    let best = 0, bestDist = Infinity;
+    cards.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < bestDist) { bestDist = d; best = i; }
+    });
+    rail.querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === best));
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 30;
+    rail.classList.toggle("at-end", atBottom);
+}
+rail.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-jump]");
+    if (!b) return;
+    const card = grid.querySelectorAll(".live-card")[Number(b.dataset.jump)];
+    if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+window.addEventListener("scroll", markRail, { passive: true });
+window.addEventListener("resize", buildRail);
+
 if (walletReady) loadLive(); else document.addEventListener("wallet-ready", loadLive, { once: true });
 document.addEventListener("wallet-connected", loadLive);
 // Quiet refresh from the chain every 15 s (not while a vote is confirming)
-setInterval(() => { if (sending === null && !document.querySelector(".welcome-backdrop:not(.hidden)")) { clearPollCache(); loadLive(); } }, 15000);
+setInterval(() => { if (sending === null && !document.querySelector(".welcome-backdrop:not(.hidden), .x-backdrop")) loadPolls(true).then(loadLive).catch(() => {}); }, 15000);
+document.addEventListener("polls-fresh", () => { if (sending === null) loadLive(); });
 document.addEventListener("wallet-disconnected", loadLive);
 
 
@@ -290,12 +353,16 @@ document.getElementById("confirmYes").addEventListener("click", async () => {
     } catch (err) {}
     sending = pollId;
     render();
+    const journey = window.voteJourney;                // the animated tracker (extras.js)
+    if (journey) journey.start({ poll: poll.question, option: poll.options[optionIndex] });
     try {
         const receipt = await sendTx("vote", { poll: poll.question, option: poll.options[optionIndex] },
             (c) => c.vote(pollId, optionIndex),
-            () => toast("Vote sent to Sepolia. Confirming… (about 15 seconds)", ""));
-        if (receipt) toast("Vote recorded on Sepolia ✓", "good");
+            (hash) => { if (journey) journey.sent(hash); else toast("Vote sent to Sepolia. Confirming… (about 15 seconds)", ""); });
+        if (receipt) { if (journey) journey.mined(receipt); else toast("Vote recorded on Sepolia ✓", "good"); }
+        else if (journey) journey.close();             // cancelled in the wallet
     } catch (err) {
+        if (journey) journey.close();
         toast(err.message, "bad");
     }
     sending = null;

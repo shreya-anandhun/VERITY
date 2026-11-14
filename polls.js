@@ -79,7 +79,10 @@ function resultHTML(p) {
         <span class="result-meta">${total.toLocaleString("en-IN")} votes · ended ${new Date(p.endTime).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
     </div>
     <div class="result-bars">${bars}</div>
-    <a class="etherscan-link" href="https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}" target="_blank" rel="noopener">Verified on-chain ↗</a>`;
+    <div class="result-foot">
+        <a class="etherscan-link" href="https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}" target="_blank" rel="noopener">Verified on-chain ↗</a>
+        <button class="tool-btn" data-recount="${p.id}" title="Count the votes yourself, straight from the blockchain">Recount it yourself</button>
+    </div>`;
 }
 
 /* ---------- Render the list ---------- */
@@ -329,3 +332,4 @@ createForm.addEventListener("submit", (e) => {
 // "Mine" and "You" depend on the wallet
 document.addEventListener("wallet-connected", () => loadAll());
 document.addEventListener("wallet-disconnected", () => { if (statusSel.value === "mine") statusSel.value = "all"; loadAll(); });
+document.addEventListener("polls-fresh", () => loadAll());

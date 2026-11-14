@@ -47,7 +47,7 @@
             if (opening && !isHome && !reduce.matches) {
                 var n = slideCount++;
                 el.style.setProperty("--from", n % 2 ? "translateX(48px)" : "translateX(-48px)");
-                el.style.setProperty("--i", Math.min(n, 10));
+                el.style.setProperty("--i", Math.min(n, 6));
                 el.classList.add("fx-slide");
                 el.addEventListener("animationend", function done(e) {
                     if (e.animationName !== "fx-slide") return;
@@ -88,6 +88,19 @@
     // Home: once the slide-in has finished, hand the transform back so the cards can tilt
     var home = document.querySelector(".content.home");
     if (home) setTimeout(function () { home.classList.remove("enter"); }, 1300);
+
+    /* ---------- Speed: start fetching a page the moment the pointer reaches its menu link ---------- */
+    var fetched = {};
+    document.querySelectorAll(".nav-item[href]").forEach(function (a) {
+        a.addEventListener("pointerenter", function () {
+            var href = a.getAttribute("href");
+            if (fetched[href] || a.classList.contains("active")) return;
+            fetched[href] = true;
+            var l = document.createElement("link");
+            l.rel = "prefetch"; l.href = href;
+            document.head.appendChild(l);
+        }, { passive: true });
+    });
 
     /* ---------- 3. Hover definitions ---------- */
     /* Longest phrases first so "smart contract" wins over "contract". */

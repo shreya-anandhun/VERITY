@@ -93,9 +93,23 @@ function cachedPolls() {
     } catch (err) {}
     return null;
 }
+const POLL_LAST = "verity-polls-last";       // localStorage: the last list we saw, shown instantly on the next visit
 function clearPollCache() {
     pollsCache = null;
-    try { sessionStorage.removeItem(POLL_CACHE); } catch (err) {}
+    try { sessionStorage.removeItem(POLL_CACHE); localStorage.removeItem(POLL_LAST); } catch (err) {}
+}
+
+// Speed: show what we saw last time straight away, then quietly check the chain
+// and tell the page ("polls-fresh") if anything changed.
+let refreshing = null;
+function refreshPollsQuietly() {
+    if (refreshing) return refreshing;
+    const before = JSON.stringify(pollsCache);
+    refreshing = loadPolls(true)
+        .then((fresh) => { if (JSON.stringify(fresh) !== before) document.dispatchEvent(new Event("polls-fresh")); })
+        .catch((err) => console.log("Background refresh failed", err))
+        .finally(() => { refreshing = null; });
+    return refreshing;
 }
 
 async function loadPolls(force = false) {
@@ -103,6 +117,10 @@ async function loadPolls(force = false) {
         if (pollsCache) return pollsCache;
         const c = cachedPolls();
         if (c) { pollsCache = c; return c; }
+        try {
+            const last = JSON.parse(localStorage.getItem(POLL_LAST));
+            if (Array.isArray(last)) { pollsCache = last; refreshPollsQuietly(); return last; }
+        } catch (err) {}
     }
 
     const raw = await withFailover(async () => {
@@ -141,7 +159,10 @@ async function loadPolls(force = false) {
 
     const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id));
     pollsCache = shown;
-    try { sessionStorage.setItem(POLL_CACHE, JSON.stringify({ time: Date.now(), polls: shown })); } catch (err) {}
+    try {
+        sessionStorage.setItem(POLL_CACHE, JSON.stringify({ time: Date.now(), polls: shown }));
+        localStorage.setItem(POLL_LAST, JSON.stringify(shown));
+    } catch (err) {}
     return shown;
 }
 
@@ -149,8 +170,11 @@ async function loadPolls(force = false) {
 async function loadMyVotes(address, polls) {
     const mine = {};
     if (!address) return mine;
-    const flags = await withFailover(() => Promise.all(polls.map((p) => readContract.hasVoted(p.id, address))));
-    const picks = await withFailover(() => Promise.all(polls.map((p, i) => flags[i] ? readContract.votedFor(p.id, address) : null)));
+    // Both questions go out together (one round trip instead of two)
+    const [flags, picks] = await withFailover(() => Promise.all([
+        Promise.all(polls.map((p) => readContract.hasVoted(p.id, address))),
+        Promise.all(polls.map((p) => readContract.votedFor(p.id, address)))
+    ]));
     polls.forEach((p, i) => { if (flags[i]) mine[p.id] = Number(picks[i]); });
     return mine;
 }
@@ -314,5 +338,6 @@ async function loadHome() {
     }
 }
 loadHome();
+document.addEventListener("polls-fresh", loadHome);
 document.addEventListener("wallet-connected", loadHome);
 document.addEventListener("wallet-disconnected", loadHome);

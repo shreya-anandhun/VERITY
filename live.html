@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Polls · VERITY</title>
 
+    <link rel="preconnect" href="https://ethereum-sepolia-rpc.publicnode.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
@@ -15,6 +17,7 @@
     <meta name="theme-color" content="#EEF2F0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="fx.css">
+    <link rel="stylesheet" href="extras.css">
     <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"light";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -109,6 +112,10 @@
         </header>
 
         <section class="content content-wide">
+            <label class="search-box live-search">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="liveSearch" placeholder="Search live polls" autocomplete="off" aria-label="Search live polls">
+            </label>
             <div class="page-intro">
                 <div class="sort-tabs" id="sortTabs">
                     <button class="tab on" data-sort="votes">Most voted</button>
@@ -228,6 +235,8 @@
     <script src="app.js"></script>
     <script src="contract.js"></script>
     <script src="live.js"></script>
+    <script src="qrcode.js"></script>
+    <script src="extras.js"></script>
     <script src="fx.js"></script>
 </body>
 </html>

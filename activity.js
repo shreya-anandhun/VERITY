@@ -80,9 +80,15 @@ async function loadHistory() {
     await Promise.all(list.map(async (tx) => { tx.time = await blockTime(tx.block); }));
     // Fees: read the receipt for each (cheap, only this wallet's)
     await Promise.all(list.map(async (tx) => {
+        // A confirmed transaction's fee never changes, so remember it in this browser
+        const fees = getSetting("fees", {});
+        if (fees[tx.hash]) { tx.feeWei = BigInt(fees[tx.hash]); tx.gas = feeText({ gasUsed: tx.feeWei, gasPrice: 1n }); return; }
         try {
             const r = await readProvider.getTransactionReceipt(tx.hash);
-            if (r) { tx.gas = feeText(r); tx.feeWei = r.gasUsed * (r.gasPrice || 0n); }
+            if (r) {
+                tx.gas = feeText(r); tx.feeWei = r.gasUsed * (r.gasPrice || 0n);
+                const all = getSetting("fees", {}); all[tx.hash] = tx.feeWei.toString(); setSetting("fees", all);
+            }
         } catch (err) {}
     }));
 
@@ -223,7 +229,14 @@ txList.addEventListener("click", (e) => {
     const t = transactions.find((x) => (x.hash || "f" + x.time) === b.dataset.receipt);
     if (!t) return;
     document.getElementById("receiptTitle").textContent = typeLabel(t) + (t.option ? ` · ${t.option}` : "");
-    document.getElementById("receiptBody").innerHTML = detailsHTML(t);
+    document.getElementById("receiptBody").innerHTML = detailsHTML(t) +
+        (t.type === "vote" && t.status === "confirmed" && window.showVoteCard
+            ? '<button type="button" class="small-btn" id="getVoteCard" style="margin-top:14px">Get my "I voted" card</button>' : "");
+    const cardBtn = document.getElementById("getVoteCard");
+    if (cardBtn) cardBtn.onclick = () => {
+        receiptModal.classList.add("hidden");
+        window.showVoteCard({ poll: t.poll, hash: t.hash, block: t.block, time: t.time, voter: currentAccount });
+    };
     receiptModal.classList.remove("hidden");
 });
 document.getElementById("receiptClose").addEventListener("click", () => receiptModal.classList.add("hidden"));
