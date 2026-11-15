@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/poll/:id", "destination": "/poll.html" },
-    { "source": "/results", "destination": "/polls.html" }
+    { "source": "/poll/:id", "destination": "/poll" },
+    { "source": "/results", "destination": "/polls" }
   ]
 }
