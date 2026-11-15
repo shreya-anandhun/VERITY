@@ -111,15 +111,12 @@
         </header>
 
         <section class="content content-wide demo-wrap">
-            <!-- Demo video. To add yours: replace the placeholder with
-                 <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
-                 or <video src="demo.mp4" controls></video> -->
+            <!-- Demo video (demo.mp4 sits next to this file; subtitles are part of the picture) -->
             <div class="demo-video" id="demoVideo">
-                <div class="demo-placeholder">
-                    <button type="button" class="play" id="demoPlay" aria-label="Play the demo video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-                    <h3>Demo video coming soon</h3>
-                    <p>A walkthrough of casting and verifying a vote on VERITY is being filmed.<br>Until then, try it yourself below. It only costs a little test ETH.</p>
-                </div>
+                <video controls preload="metadata" playsinline poster="demo-poster.jpg" aria-label="VERITY demo video, 3 minutes, with subtitles">
+                    <source src="demo.mp4" type="video/mp4">
+                    Your browser can't play this video. <a href="demo.mp4">Download it instead</a>.
+                </video>
             </div>
 
             <div class="demo-steps">
@@ -193,9 +190,5 @@
     <script src="app.js"></script>
     <script src="contract.js"></script>
     <script src="fx.js"></script>
-    <script>
-        document.getElementById("demoPlay").addEventListener("click", () =>
-            toast("The demo video is being filmed — it'll appear right here soon. Try it live below instead.", ""));
-    </script>
 </body>
 </html>
