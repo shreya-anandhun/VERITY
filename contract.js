@@ -36,7 +36,7 @@ const LIMITS = { title: 200, category: 32, option: 100, minOptions: 2, maxOption
 
 // Polls hidden from the site (they still exist on-chain; nothing can delete them).
 // Add a poll's ID here to stop VERITY showing it anywhere.
-const HIDDEN_POLLS = [];
+const HIDDEN_POLLS = [1];   // #1 is an accidental duplicate of #0
 
 // Public Sepolia nodes for READING (works even with no wallet connected).
 // We talk to one node at a time; if it errors, we move to the next in the list.
