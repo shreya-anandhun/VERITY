@@ -102,7 +102,7 @@ function render() {
         empty.textContent = ranked.length ? "No live polls match your search" : "No polls currently live";
         grid.innerHTML = ""; buildRail(); return;
     }
-    const tools = (id) => `<span class="card-tools"><button class="tool-btn" data-recount="${id}" title="Count the votes yourself, straight from the blockchain">Recount</button><button class="tool-btn" data-present="${id}" title="Full-screen view with a QR code, for a projector">Present</button></span>`;
+    const tools = (id) => `<span class="card-tools"><a class="tool-btn" href="${pollLink(id)}" title="This poll's own page: chart, every vote, share link">Details</a><button class="tool-btn" data-recount="${id}" title="Count the votes yourself, straight from the blockchain">Recount</button><button class="tool-btn" data-present="${id}" title="Full-screen view with a QR code, for a projector">Present</button></span>`;
 
     grid.innerHTML = shown.map((p) => {
         const total = pollTotal(p);
@@ -287,7 +287,7 @@ grid.addEventListener("click", (e) => {
     if (repBtn)   { openReport(Number(repBtn.dataset.report)); return; }
     const shareBtn = e.target.closest("[data-share]");
     if (shareBtn) {
-        const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "live.html?poll=" + shareBtn.dataset.share;
+        const url = pollLink(Number(shareBtn.dataset.share), true);
         copyText(url).then((ok) => toast(ok ? "Link copied" : url, ok ? "good" : ""));
         return;
     }

@@ -43,16 +43,16 @@
             </div>
             <h4>${escapeHTML(p.question)}</h4>
             <div class="h-f-opts">${p.options.map((o, i) =>
-                `<a class="h-opt" href="live.html?poll=${p.id}"><span>${escapeHTML(o)}</span><span class="h-opt-go" aria-hidden="true">Vote →</span></a>`).join("")}
+                `<a class="h-opt" href="${pollLink(p.id)}"><span>${escapeHTML(o)}</span><span class="h-opt-go" aria-hidden="true">Vote →</span></a>`).join("")}
             </div>
             <p class="h-f-foot"><span>${p.totalVotes} ${p.totalVotes === 1 ? "vote" : "votes"} so far · results appear after you vote</span>
-                <a href="live.html?poll=${p.id}">Open poll →</a></p>`;
+                <a href="${pollLink(p.id)}">Open poll page →</a></p>`;
         ticking = setInterval(() => {
             const el = document.getElementById("featTime");
             if (el) el.textContent = formatTimeLeft(p.endTime - Date.now());
         }, 1000);
         side.innerHTML = live.slice(1, 3).map((q) => `
-            <a class="h-mini" href="live.html?poll=${q.id}">
+            <a class="h-mini" href="${pollLink(q.id)}">
                 <span class="h-mini-cat">${escapeHTML(q.category)}</span>
                 <b>${escapeHTML(q.question)}</b>
                 <span class="h-mini-meta">${q.totalVotes} ${q.totalVotes === 1 ? "vote" : "votes"} · ends in ${formatTimeLeft(q.endTime - Date.now()).replace(/ \d+s$/, "")}</span>
@@ -71,7 +71,7 @@
         feed.innerHTML = items.map((x) => `
             <li>
                 <span class="h-ev ${x.kind}" aria-hidden="true">${x.kind === "vote" ? "✓" : "+"}</span>
-                <span class="h-ev-text"><span class="mono">${escapeHTML(x.who)}</span> ${x.kind === "vote" ? "voted in" : "created"} <b>${escapeHTML(x.poll)}</b></span>
+                <span class="h-ev-text"><span class="mono">${escapeHTML(x.who)}</span> ${x.kind === "vote" ? "voted in" : "created"} <a class="h-ev-poll" href="${pollLink(x.id)}">${escapeHTML(x.poll)}</a></span>
                 <span class="h-ev-when">${x.time ? ago(x.time) : ""}</span>
                 <a class="h-ev-link" href="${ETHERSCAN}${x.hash}" target="_blank" rel="noopener" aria-label="View this transaction on Etherscan">Block #${Number(x.block).toLocaleString("en-US")} ↗</a>
             </li>`).join("");
@@ -85,8 +85,8 @@
         const keep = (ev) => !HIDDEN_POLLS.includes(Number(ev.args.pollId)) && title(Number(ev.args.pollId));
         const wallets = new Set(votes.filter(keep).map((ev) => ev.args.voter.toLowerCase())).size;
         const items = [
-            ...votes.filter(keep).map((ev) => ({ kind: "vote", who: short(ev.args.voter), poll: title(Number(ev.args.pollId)), block: ev.blockNumber, hash: ev.transactionHash })),
-            ...made.filter(keep).map((ev) => ({ kind: "create", who: short(ev.args.creator), poll: title(Number(ev.args.pollId)), block: ev.blockNumber, hash: ev.transactionHash }))
+            ...votes.filter(keep).map((ev) => ({ kind: "vote", id: Number(ev.args.pollId), who: short(ev.args.voter), poll: title(Number(ev.args.pollId)), block: ev.blockNumber, hash: ev.transactionHash })),
+            ...made.filter(keep).map((ev) => ({ kind: "create", id: Number(ev.args.pollId), who: short(ev.args.creator), poll: title(Number(ev.args.pollId)), block: ev.blockNumber, hash: ev.transactionHash }))
         ].sort((a, b) => b.block - a.block).slice(0, 6);
         await Promise.all(items.map(async (x) => { try { x.time = await blockTime(x.block); } catch (err) {} }));
         drawFeed(items, wallets);

@@ -73,11 +73,11 @@ async function loadHistory() {
     createdEvs = createdEvs.filter((ev) => !HIDDEN_POLLS.includes(Number(ev.args.pollId)));
     for (const ev of votedEvs) {
         const p = polls.find((x) => x.id === Number(ev.args.pollId));
-        list.push({ hash: ev.transactionHash, type: "vote", status: "confirmed", block: ev.blockNumber,
+        list.push({ hash: ev.transactionHash, type: "vote", status: "confirmed", block: ev.blockNumber, pollId: Number(ev.args.pollId),
             poll: p ? p.question : `Poll #${ev.args.pollId}`, option: p ? p.options[Number(ev.args.optionIndex)] : "", time: 0 });
     }
     for (const ev of createdEvs) {
-        list.push({ hash: ev.transactionHash, type: "create", status: "confirmed", block: ev.blockNumber,
+        list.push({ hash: ev.transactionHash, type: "create", status: "confirmed", block: ev.blockNumber, pollId: Number(ev.args.pollId),
             poll: ev.args.title, option: null, time: 0 });
     }
     // Times and fees are asked for together, not one after the other
@@ -227,7 +227,7 @@ function renderHistory() {
             <span class="tl-ic">${icon}</span>
             <span class="tl-text">
                 <strong>${typeLabel(t)}${t.option ? ` · ${escapeHTML(t.option)}` : ""}</strong>
-                <small>${escapeHTML(t.poll)}${t.block ? ` · block #${t.block.toLocaleString("en-US")}` : ""}${t.reason ? ` · ${escapeHTML(t.reason)}` : ""}</small>
+                <small>${t.pollId !== undefined ? `<a class="tl-poll" href="${pollLink(t.pollId)}">${escapeHTML(t.poll)}</a>` : escapeHTML(t.poll)}${t.block ? ` · block #${t.block.toLocaleString("en-US")}` : ""}${t.reason ? ` · ${escapeHTML(t.reason)}` : ""}</small>
             </span>
             <span class="tl-right">
                 <span class="status-pill ${t.status}">${statusText[t.status]}</span>

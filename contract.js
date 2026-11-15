@@ -237,6 +237,12 @@ async function showFeeEstimate(el, method, args) {
     }
 }
 
+// Every poll has its own page: /poll/7 on the live site (poll.html?id=7 when opened as a local file)
+function pollLink(id, absolute) {
+    if (location.protocol === "file:") return "poll.html?id=" + id;
+    return (absolute ? location.origin : "") + "/poll/" + id;
+}
+
 // Start fetching the polls the moment this file loads, before the wallet check finishes
 loadPolls().catch(() => {});
 

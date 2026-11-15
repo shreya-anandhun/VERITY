@@ -80,7 +80,7 @@ function resultHTML(p) {
     </div>
     <div class="result-bars">${bars}</div>
     <div class="result-foot">
-        <a class="etherscan-link" href="https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}" target="_blank" rel="noopener">Verified on-chain ↗</a>
+        <a class="etherscan-link" href="${pollLink(p.id)}">Full results, chart and every vote →</a>
         <button class="tool-btn" data-recount="${p.id}" title="Count the votes yourself, straight from the blockchain">Recount it yourself</button>
     </div>`;
 }
@@ -144,7 +144,7 @@ function render() {
         if (live) {
             return `
             <article class="poll-row live ${isMine(p) ? "has-close" : ""}">
-                <a class="row-main" href="live.html?poll=${p.id}" aria-label="Open poll: ${escapeHTML(p.question)}">
+                <a class="row-main" href="${pollLink(p.id)}" aria-label="Open poll: ${escapeHTML(p.question)}">
                     ${inner}
                     <svg class="row-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
@@ -187,6 +187,13 @@ rows.addEventListener("click", (e) => {
     openId = openId === Number(b.dataset.expand) ? null : Number(b.dataset.expand);
     render();
 });
+
+// /results (or polls.html?status=ended) opens straight on the finished polls
+if (/\/results/.test(location.pathname) || new URLSearchParams(location.search).get("status") === "ended") {
+    statusSel.value = "ended";
+    document.title = "Results · VERITY";
+    const t = document.querySelector(".page-title"); if (t) t.textContent = "Results";
+}
 
 // Arrived from a link? e.g. polls.html?poll=5 opens that result
 const wantedPoll = new URLSearchParams(location.search).get("poll");
