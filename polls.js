@@ -268,6 +268,9 @@ function resetCreateForm() {
     min.setSeconds(0, 0);
     const pad = (n) => String(n).padStart(2, "0");
     cfEnd.min = `${min.getFullYear()}-${pad(min.getMonth() + 1)}-${pad(min.getDate())}T${pad(min.getHours())}:${pad(min.getMinutes())}`;
+    // Latest allowed end: the contract caps polls at one year
+    const max = new Date(Date.now() + 364 * 24 * H);
+    cfEnd.max = `${max.getFullYear()}-${pad(max.getMonth() + 1)}-${pad(max.getDate())}T23:59`;
 }
 function formHasText() {
     return !![document.getElementById("cfQuestion"), ...cfOptions.querySelectorAll("input")].find((i) => i.value.trim());
@@ -317,6 +320,10 @@ createForm.addEventListener("submit", (e) => {
     if (new Set(options.map((o) => o.toLowerCase())).size !== options.length) {
         err.textContent = "Two options are the same. Make each one different."; err.classList.remove("hidden"); return;
     }
+    const bytes = (t) => new TextEncoder().encode(t).length;   // the contract counts bytes (emoji take up to 4)
+    if (bytes(question) > LIMITS.title) { err.textContent = "That question is too long. Try a shorter one."; err.classList.remove("hidden"); return; }
+    if (options.some((o) => bytes(o) > LIMITS.option)) { err.textContent = "One of the options is too long."; err.classList.remove("hidden"); return; }
+    if (endTime > Date.now() + 364 * 24 * H) { err.textContent = "Polls can run for at most a year."; err.classList.remove("hidden"); return; }
     if (!(endTime > Date.now() + H - 60000)) { err.textContent = "The poll must run for at least an hour."; err.classList.remove("hidden"); return; }
     createModal.classList.add("hidden");
 

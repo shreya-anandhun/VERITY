@@ -4,12 +4,15 @@
    Loaded on every page after app.js.
    ========================================================= */
 
+const POLL_VIEW = "tuple(uint256 id, string title, string category, string[] options, uint256[] votes, address creator, uint64 createdAt, uint64 endTime, bool isOpen, uint256 totalVotes)";
 const VOTING_ABI = [
     "function createPoll(string title, string category, string[] options, uint256 endTime) returns (uint256)",
     "function vote(uint256 pollId, uint256 optionIndex)",
     "function closePoll(uint256 pollId)",
     "function pollCount() view returns (uint256)",
-    "function getPoll(uint256 pollId) view returns (string title, string category, string[] options, uint256[] votes, address creator, uint256 endTime, bool isOpen, uint256 totalVotes)",
+    `function getPoll(uint256 pollId) view returns (${POLL_VIEW})`,
+    `function getPolls(uint256 offset, uint256 limit) view returns (${POLL_VIEW}[])`,
+    "function getVotes(uint256 pollId) view returns (uint256[])",
     "function hasVoted(uint256 pollId, address voter) view returns (bool)",
     "function votedFor(uint256 pollId, address voter) view returns (uint256)",
     "event PollCreated(uint256 indexed pollId, address indexed creator, string title, string category)",
@@ -17,9 +20,23 @@ const VOTING_ABI = [
     "event PollClosed(uint256 indexed pollId)"
 ];
 
+// Limits the contract enforces (the forms check these first so nobody pays for a failed transaction)
+const LIMITS = { title: 200, category: 32, option: 100, minOptions: 2, maxOptions: 10, maxDays: 365 };
+
+// When the contract changes, cached data from the old one is wrong: clear it
+// (theme, name, wallet choice and settings are kept).
+(function resetCachesOnNewContract() {
+    try {
+        if (localStorage.getItem("verity-contract") === CONTRACT_ADDRESS) return;
+        ["polls-last", "created", "feed", "history", "fees", "pending", "failed"].forEach((k) => localStorage.removeItem("verity-" + k));
+        sessionStorage.removeItem("verity-polls-cache");
+        localStorage.setItem("verity-contract", CONTRACT_ADDRESS);
+    } catch (err) {}
+})();
+
 // Polls hidden from the site (they still exist on-chain; nothing can delete them).
 // Add a poll's ID here to stop VERITY showing it anywhere.
-const HIDDEN_POLLS = [3];
+const HIDDEN_POLLS = [];
 
 // Public Sepolia nodes for READING (works even with no wallet connected).
 // We talk to one node at a time; if it errors, we move to the next in the list.
@@ -51,7 +68,7 @@ async function withFailover(fn) {
 }
 
 // The block the contract was deployed in: no events exist before it
-const DEPLOY_BLOCK = 12120000;
+const DEPLOY_BLOCK = 12140105;
 
 // Public nodes only allow 50,000 blocks per event query, so we ask in chunks
 async function queryEvents(filter) {
@@ -141,12 +158,13 @@ let inflight = null;
 async function fetchPolls() {
     const raw = await withFailover(async () => {
         const count = Number(await readContract.pollCount());
-        // Ask for every poll at once instead of one after another
-        return Promise.all(Array.from({ length: count }, (_, i) => readContract.getPoll(i)));
+        // getPolls hands back up to 50 polls per call; ask for every page at once
+        const pages = [];
+        for (let offset = 0; offset < count; offset += 50) pages.push(readContract.getPolls(offset, 50));
+        return (await Promise.all(pages)).flat();
     });
-    const created = getSetting("created", {});
-    const polls = raw.map((p, i) => ({
-        id: i,
+    const polls = raw.map((p) => ({
+        id: Number(p.id),
         question: p.title,
         category: p.category || "Other",
         options: [...p.options],
@@ -155,30 +173,10 @@ async function fetchPolls() {
         endTime: Number(p.endTime) * 1000,
         isOpen: p.isOpen,
         totalVotes: Number(p.totalVotes),
-        createdAt: created[i] || 0
+        createdAt: Number(p.createdAt) * 1000      // stored on-chain in v2
     }));
-
     const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id));
     savePolls(shown);
-
-    // Creation times need a slow search through old events. Don't make the page wait:
-    // show the polls now and fill the times in when they arrive.
-    if (polls.some((p) => !p.createdAt)) {
-        (async () => {
-            try {
-                const events = await queryEvents(readContract.filters.PollCreated());
-                const blocks = [...new Set(events.map((e) => e.blockNumber))];
-                const times = {};
-                await Promise.all(blocks.map(async (bn) => { times[bn] = await blockTime(bn); }));
-                for (const ev of events) {
-                    const poll = polls[Number(ev.args.pollId)];
-                    if (poll) { poll.createdAt = times[ev.blockNumber]; created[poll.id] = poll.createdAt; }
-                }
-                setSetting("created", created);
-                if (pollsCache === shown) { savePolls(shown); document.dispatchEvent(new Event("polls-fresh")); }
-            } catch (err) { console.log("Could not read creation times", err); }
-        })();
-    }
     return shown;
 }
 function savePolls(shown) {
@@ -266,6 +264,10 @@ function friendlyError(err) {
     if (/Poll is closed/i.test(msg)) return "This poll has closed";
     if (/insufficient funds/i.test(msg)) return "Not enough Sepolia ETH for the network fee";
     if (/Only the creator/i.test(msg)) return "Only the poll's creator can close it";
+    if (/Already closed/i.test(msg)) return "This poll is already closed";
+    if (/No such (poll|option)/i.test(msg)) return "That poll or option doesn't exist";
+    if (/Title must be|Category must be|2 to 10 options|Each option must be|End time must be|at most a year/i.test(msg))
+        return (msg.match(/(Title must be[^"]*|Category must be[^"]*|2 to 10 options|Each option must be[^"]*|End time must be in the future|Polls can last at most a year)/) || [msg])[0];
     if (/missing revert data|execution reverted|CALL_EXCEPTION/i.test(msg)) return "The network rejected this. Most likely this wallet already voted, or the poll has closed.";
     return msg.length > 170 ? msg.slice(0, 170) + "…" : msg;
 }

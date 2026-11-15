@@ -116,10 +116,12 @@
             <div class="doc-card">
                 <h3>The contract</h3>
                 <dl class="doc-facts">
-                    <div><dt>Address</dt><dd class="mono">0x90498Ad55b09c2b07d51e2aF703c539286F28f1d</dd></div>
+                    <div><dt>Address</dt><dd class="mono">0x333b410002b0c6c4639b98a5c5d93d916a092848</dd></div>
                     <div><dt>Network</dt><dd>Ethereum Sepolia (test network)</dd></div>
-                    <div><dt>Language</dt><dd>Solidity 0.8.34, one file, no libraries</dd></div>
-                    <div><dt>Source code</dt><dd><a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d#code" target="_blank" rel="noopener">Verified on Etherscan ↗</a></dd></div>
+                    <div><dt>Version</dt><dd>VotingV2 (adds input limits, on-chain creation time and paged reads)</dd></div>
+                    <div><dt>Language</dt><dd>Solidity 0.8.34, one file, no libraries, optimizer on (200 runs)</dd></div>
+                    <div><dt>Earlier version</dt><dd>VERITY started on <a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d" target="_blank" rel="noopener">version 1 ↗</a>. Its polls are still on the blockchain and readable there; the site now uses version 2.</dd></div>
+                    <div><dt>Source code</dt><dd><a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#code" target="_blank" rel="noopener">Verified on Etherscan ↗</a></dd></div>
                 </dl>
             </div>
 
@@ -127,12 +129,13 @@
                 <h3>What each poll stores</h3>
                 <table class="doc-table">
                     <tr><th>Field</th><th>Meaning</th></tr>
-                    <tr><td class="mono">title</td><td>The question</td></tr>
-                    <tr><td class="mono">category</td><td>Club, College, Tech, Events, Fun or Other</td></tr>
-                    <tr><td class="mono">options[]</td><td>2 to 10 answers</td></tr>
+                    <tr><td class="mono">title</td><td>The question (up to 200 bytes)</td></tr>
+                    <tr><td class="mono">category</td><td>Club, College, Tech, Events, Fun or Other (up to 32 bytes)</td></tr>
+                    <tr><td class="mono">options[]</td><td>2 to 10 answers, each up to 100 bytes</td></tr>
                     <tr><td class="mono">votes[]</td><td>One running count per option</td></tr>
                     <tr><td class="mono">creator</td><td>The wallet that created the poll</td></tr>
-                    <tr><td class="mono">endTime</td><td>When voting stops automatically</td></tr>
+                    <tr><td class="mono">createdAt</td><td>When the poll was created (block time)</td></tr>
+                    <tr><td class="mono">endTime</td><td>When voting stops automatically (at most a year after creation)</td></tr>
                     <tr><td class="mono">isOpen</td><td>False once the creator closes it early</td></tr>
                     <tr><td class="mono">totalVotes</td><td>All votes cast in the poll</td></tr>
                 </table>
@@ -142,10 +145,12 @@
                 <h3>Every function, and who can call it</h3>
                 <table class="doc-table">
                     <tr><th>Function</th><th>Who</th><th>What it does</th></tr>
-                    <tr><td class="mono">createPoll(title, category, options, endTime)</td><td>Anyone</td><td>Adds a new poll. Rejected unless it has 2 to 10 options and an end time in the future.</td></tr>
+                    <tr><td class="mono">createPoll(title, category, options, endTime)</td><td>Anyone</td><td>Adds a new poll. Rejected unless every field is within its limit, it has 2 to 10 options, and it ends between now and one year from now.</td></tr>
                     <tr><td class="mono">vote(pollId, optionIndex)</td><td>Anyone, once per poll</td><td>Adds one to that option. Rejected if the poll is closed, has ended, or this wallet already voted.</td></tr>
                     <tr><td class="mono">closePoll(pollId)</td><td>That poll's creator only</td><td>Stops new votes early. Existing votes are untouched.</td></tr>
                     <tr><td class="mono">getPoll(pollId)</td><td>Anyone, free</td><td>Reads a poll and its live counts.</td></tr>
+                    <tr><td class="mono">getPolls(offset, limit)</td><td>Anyone, free</td><td>Reads up to 50 polls in one call. This is how the website loads the list.</td></tr>
+                    <tr><td class="mono">getVotes(pollId)</td><td>Anyone, free</td><td>Just the vote counts for one poll.</td></tr>
                     <tr><td class="mono">hasVoted(pollId, wallet)</td><td>Anyone, free</td><td>True if that wallet has voted in that poll.</td></tr>
                     <tr><td class="mono">votedFor(pollId, wallet)</td><td>Anyone, free</td><td>Which option that wallet picked.</td></tr>
                     <tr><td class="mono">pollCount()</td><td>Anyone, free</td><td>How many polls exist.</td></tr>
@@ -166,10 +171,10 @@
             <div class="doc-card">
                 <h3>Verify a result yourself, without this website</h3>
                 <ol class="doc-list">
-                    <li>Open the <a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d#readContract" target="_blank" rel="noopener">contract's Read Contract tab on Etherscan ↗</a>.</li>
+                    <li>Open the <a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#readContract" target="_blank" rel="noopener">contract's Read Contract tab on Etherscan ↗</a>.</li>
                     <li>Expand <span class="mono">getPoll</span>, type a poll number (the first poll is 0) and press Query.</li>
                     <li>Compare the <span class="mono">votes</span> numbers with what VERITY shows. They come from the same place, so they always match.</li>
-                    <li>To see who voted, open the <a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d#events" target="_blank" rel="noopener">Events tab ↗</a>: every <span class="mono">Voted</span> line is one vote.</li>
+                    <li>To see who voted, open the <a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#events" target="_blank" rel="noopener">Events tab ↗</a>: every <span class="mono">Voted</span> line is one vote.</li>
                 </ol>
                 <p class="doc-note">Or press <b>Recount</b> on any poll: your browser re-adds every vote event and checks the total against the contract.</p>
             </div>
@@ -181,7 +186,7 @@
                 <p>Tamper-proof polls on Ethereum. Built by Shreya Anandhun for CodeKrafters, SRM.</p>
             </div>
             <nav aria-label="Use VERITY"><h5>Use it</h5><a href="live.html">Live polls</a><a href="polls.html">All polls</a><a href="demo.html">Demo video</a></nav>
-            <nav aria-label="Verify VERITY"><h5>Verify it</h5><a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d#code" target="_blank" rel="noopener">Contract on Etherscan ↗</a><a href="docs.html">Docs</a><a href="how-it-works.html">How it works</a></nav>
+            <nav aria-label="Verify VERITY"><h5>Verify it</h5><a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#code" target="_blank" rel="noopener">Contract on Etherscan ↗</a><a href="docs.html">Docs</a><a href="how-it-works.html">How it works</a></nav>
             <nav aria-label="The project"><h5>Project</h5><a href="https://github.com/shreya-anandhun/VERITY" target="_blank" rel="noopener">Source on GitHub ↗</a><a href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report">Report an issue</a></nav>
             <p class="sf-bottom">Runs on the Sepolia test network · VERITY charges no fees · No owner, no admin, no edit button</p>
         </footer>

@@ -3,7 +3,8 @@
 Transparent voting on Ethereum Sepolia. Every vote is a signed transaction, recorded by the Voting smart contract and verifiable by anyone on Etherscan.
 
 - Live site: deployed on Vercel from this repository
-- Contract: `0x90498Ad55b09c2b07d51e2aF703c539286F28f1d` (Sepolia)
+- Contract: `0x333b410002b0c6c4639b98a5c5d93d916a092848` (VotingV2, Sepolia, source in `contracts/VotingV2.sol`)
+- Previous contract (v1): `0x90498Ad55b09c2b07d51e2aF703c539286F28f1d`
 - Stack: HTML, CSS, JavaScript, ethers.js v6, Phantom / MetaMask
 
 ## Run locally

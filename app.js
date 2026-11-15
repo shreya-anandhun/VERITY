@@ -10,7 +10,7 @@ let livePollCount = 0;
 const SEPOLIA_CHAIN_ID = "0xaa36a7";   // Sepolia's network ID (11155111) in hex
 
 // Your deployed Voting contract (paste the full address from Remix here)
-const CONTRACT_ADDRESS = "0x90498Ad55b09c2b07d51e2aF703c539286F28f1d";
+const CONTRACT_ADDRESS = "0x333b410002b0c6c4639b98a5c5d93d916a092848";
 
 let walletReady = false;   // true once we know whether a wallet was already connected
 
