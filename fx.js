@@ -117,6 +117,7 @@
         { re: /\bEthereum\b/, title: "Ethereum", def: "A public blockchain that can run programs as well as move money. VERITY's voting rules live on it." },
         { re: /\bSepolia\b/, title: "Sepolia", def: "Ethereum's practice network. It works like the real one, but the coins are free, so voting here costs no real money." },
         { re: /\bPhantom\b/, title: "Phantom", def: "A wallet app that lives in your browser. It holds your keys and asks you to approve every vote before it is sent." },
+        { re: /\bMetaMask\b/, title: "MetaMask", def: "The most widely used Ethereum wallet. Like Phantom, it holds your keys and asks you to approve every vote. Set it to the Sepolia network for VERITY." },
         { re: /\bwallets?\b/i, title: "Wallet", def: "An app that holds your keys and proves who you are on the blockchain. On VERITY, one wallet means one vote." },
         { re: /\btransactions?\b/i, title: "Transaction", def: "Any action recorded on the blockchain, such as casting a vote or creating a poll. Each one is public and permanent." },
         { re: /\bimmutable\b/i, title: "Immutable", def: "Can't be changed once it is written. Not by you, not by us, not by anyone." },

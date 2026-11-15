@@ -246,39 +246,47 @@ setInterval(updateCountdown, 1000);
 /* ---------- 5. Connect Phantom wallet ---------- */
 const connectBtn = document.getElementById("connectBtn");
 
-// Finding Phantom's Ethereum connection.
-// Phantom usually puts it at window.phantom.ethereum, but depending on the
-// browser and Phantom's settings it can also show up as window.ethereum or
-// announce itself through the EIP-6963 "announceProvider" event. We check all three.
-let announcedPhantom = null;
+// Finding the wallets in this browser: Phantom and MetaMask.
+// Wallets announce themselves through EIP-6963 (the modern way), and older
+// setups also put themselves on window.phantom / window.ethereum. We check all of them.
+const WALLETS = {
+    phantom:  { name: "Phantom",  download: "https://phantom.com/download",  rdns: /phantom/i },
+    metamask: { name: "MetaMask", download: "https://metamask.io/download/", rdns: /metamask/i }
+};
+const announced = {};
 window.addEventListener("eip6963:announceProvider", (e) => {
-    const info = e.detail && e.detail.info;
-    if (info && /phantom/i.test(info.name || "") && e.detail.provider) announcedPhantom = e.detail.provider;
+    const d = e.detail || {};
+    const info = d.info || {};
+    for (const key in WALLETS) {
+        if (WALLETS[key].rdns.test((info.rdns || "") + " " + (info.name || "")) && d.provider) announced[key] = d.provider;
+    }
 });
 window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-// Which wallet is installed? Phantom is recommended, MetaMask also works.
-function walletName() {
-    const p = getProvider();
-    if (!p) return "Phantom";
-    if (p.isMetaMask && !p.isPhantom) return "MetaMask";
-    return "Phantom";
+// The provider object for one wallet, or null if it isn't installed here
+function findWallet(key) {
+    if (announced[key]) return announced[key];
+    const eth = window.ethereum;
+    const list = eth ? (Array.isArray(eth.providers) ? eth.providers : [eth]) : [];
+    if (key === "phantom") {
+        if (window.phantom && window.phantom.ethereum) return window.phantom.ethereum;
+        return list.find((p) => p && p.isPhantom) || null;
+    }
+    // Phantom also says "isMetaMask" for compatibility, so rule it out
+    return list.find((p) => p && p.isMetaMask && !p.isPhantom && !p.isBraveWallet) || null;
 }
 
-function getProvider() {
-    if (window.phantom && window.phantom.ethereum) return window.phantom.ethereum;
-    if (announcedPhantom) return announcedPhantom;
-    const eth = window.ethereum;
-    if (eth) {
-        if (eth.isPhantom) return eth;
-        if (Array.isArray(eth.providers)) {
-            const p = eth.providers.find((x) => x.isPhantom) || eth.providers.find((x) => x.isMetaMask);
-            if (p) return p;
-        }
-        if (eth.isMetaMask) return eth;      // no Phantom, but MetaMask is here: use it
-    }
-    return null;
+// Which wallet the person picked (remembered on this device)
+function chosenWallet() {
+    let k = null;
+    try { k = localStorage.getItem("verity-wallet"); } catch (err) {}
+    if (k && findWallet(k)) return k;
+    if (findWallet("phantom")) return "phantom";
+    if (findWallet("metamask")) return "metamask";
+    return k || "phantom";
 }
+function getProvider() { return findWallet(chosenWallet()); }
+function walletName() { return WALLETS[chosenWallet()].name; }
 
 function shortAddress(addr) {
     try { if (window.ethers) addr = ethers.getAddress(addr); } catch (err) {}   // same capitalisation everywhere
@@ -372,16 +380,23 @@ const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 function phantomAppLink() {
     return "https://phantom.app/ul/browse/" + encodeURIComponent(location.href) + "?ref=" + encodeURIComponent(location.origin);
 }
+function metamaskAppLink() {
+    return "https://metamask.app.link/dapp/" + location.host + location.pathname + location.search;
+}
+function appLink(key) { return key === "metamask" ? metamaskAppLink() : phantomAppLink(); }
 
-async function connectWallet() {
-    const provider = getProvider();
+async function connectWallet(key) {
+    key = key || chosenWallet();
+    const provider = findWallet(key);
 
-    // No wallet here? On a phone, reopen this page inside the Phantom app. On a computer, go and install it.
+    // That wallet isn't here? On a phone, reopen this page inside the wallet's app. On a computer, go and install it.
     if (!provider) {
-        if (isPhone) location.href = phantomAppLink();
-        else window.open("https://phantom.com/download", "_blank");
+        if (isPhone) location.href = appLink(key);
+        else window.open(WALLETS[key].download, "_blank");
         return;
     }
+    try { localStorage.setItem("verity-wallet", key); } catch (err) {}
+    listenToWallet(provider);
 
     // They chose to connect, so forget any earlier "Disconnect"
     try { localStorage.removeItem("verity-disconnected"); } catch (err) {}
@@ -420,6 +435,7 @@ async function disconnectWallet() {
     } catch (err) {}
     try {
         localStorage.setItem("verity-disconnected", "1");
+        localStorage.removeItem("verity-wallet");          // next time, choose a wallet again
         localStorage.removeItem("verity-name");
         sessionStorage.removeItem("verity-welcomed");
     } catch (err) {}
@@ -437,28 +453,32 @@ const connectModal = document.getElementById("connectModal");
 
 function openConnectModal() {
     if (!connectModal) return;
-    // Phantom not installed -> only show the "I'm new" option
     window.dispatchEvent(new Event("eip6963:requestProvider"));
-    const installed = !!getProvider();
-    if (!installed) console.log("No wallet detected. window.phantom =", window.phantom, "window.ethereum =", window.ethereum);
-    const name = walletName();
-    document.querySelectorAll("[data-wallet-name]").forEach((el) => el.textContent = name);
-    document.getElementById("connectHave").classList.toggle("hidden", !installed);
-    document.getElementById("connectNoExt").classList.toggle("hidden", installed);
-    if (!installed && isPhone) {
-        // On a phone the useful button is "open this page in the Phantom app"
-        const nw = document.getElementById("connectNew");
-        nw.href = phantomAppLink();
-        nw.removeAttribute("target");
-        nw.querySelector("strong").textContent = "Open VERITY in the Phantom app";
-        nw.querySelector("small").textContent = "Phone browsers can't reach your wallet. This reopens the page inside Phantom, where you can connect and vote.";
-        document.getElementById("connectNoExt").innerHTML = 'No Phantom app yet? <a href="https://phantom.com/download" target="_blank" rel="noopener">Get it free</a>, then scan the QR code again.';
-        const h = connectModal.querySelector("h2");
-        if (h) h.textContent = "Voting from your phone?";
-        const intro = connectModal.querySelector(".welcome-text");
-        if (intro) intro.textContent = "You have the Phantom app, but this browser can't see it. One tap fixes that.";
+    let anyInstalled = false;
+    for (const key in WALLETS) {
+        const here = !!findWallet(key);
+        anyInstalled = anyInstalled || here;
+        const btn = connectModal.querySelector(`[data-wallet="${key}"]`);
+        const status = connectModal.querySelector(`[data-wallet-status="${key}"]`);
+        if (btn) btn.classList.toggle("installed", here);
+        if (status) status.textContent = here
+            ? "Found in this browser. Click to connect."
+            : isPhone ? `Opens this page inside the ${WALLETS[key].name} app`
+            : `Not installed. Click to get it free, then come back.`;
+    }
+    const intro = document.getElementById("connectIntro");
+    const title = document.getElementById("connectTitle");
+    const note = document.getElementById("connectNoExt");
+    if (!anyInstalled && isPhone) {
+        if (title) title.textContent = "Voting from your phone?";
+        if (intro) intro.textContent = "Phone browsers can't reach a wallet app. Pick your wallet and this page reopens inside it, where you can connect and vote.";
+        if (note) note.textContent = "No wallet app yet? Phantom and MetaMask are both free in the App Store and Google Play.";
         const bar = document.getElementById("phoneBar");
         if (bar) bar.remove();
+    } else if (note) {
+        note.textContent = anyInstalled
+            ? "Using both? Pick the one you want to vote with. You can switch later by signing out."
+            : "New to wallets? Both are free. Install one, come back to this page, and connect.";
     }
     profilePanel.classList.remove("open");
     connectModal.classList.remove("hidden");
@@ -467,18 +487,15 @@ function closeConnectModal() { if (connectModal) connectModal.classList.add("hid
 function refreshWalletNames() {
     const name = walletName();
     document.querySelectorAll("[data-wallet-name]").forEach((el) => el.textContent = name);
-    const nw = document.getElementById("connectNew");
-    if (nw) nw.classList.toggle("hidden", !!getProvider() && name === "MetaMask");   // they already have a wallet
 }
 refreshWalletNames();
 document.addEventListener("wallet-ready", refreshWalletNames);
 
 if (connectModal) {
-    document.getElementById("connectHave").addEventListener("click", () => {
+    connectModal.querySelectorAll("[data-wallet]").forEach((btn) => btn.addEventListener("click", () => {
         closeConnectModal();
-        connectWallet();
-    });
-    document.getElementById("connectNew").addEventListener("click", closeConnectModal);
+        connectWallet(btn.dataset.wallet);
+    }));
     document.getElementById("connectCancel").addEventListener("click", closeConnectModal);
     connectModal.addEventListener("click", (e) => { if (e.target === connectModal) closeConnectModal(); });
 }
@@ -610,14 +627,27 @@ function showPhoneBar() {
     const bar = document.createElement("div");
     bar.id = "phoneBar";
     bar.className = "phone-bar";
-    bar.innerHTML = '<span><b>To vote on your phone</b>open this page inside the Phantom app.</span>' +
-        '<a class="phone-bar-btn" href="' + phantomAppLink() + '">Open in Phantom</a>' +
+    bar.innerHTML = '<span><b>To vote on your phone</b>open this page inside your wallet app.</span>' +
+        '<a class="phone-bar-btn" href="' + phantomAppLink() + '">Phantom</a>' +
+        '<a class="phone-bar-btn alt" href="' + metamaskAppLink() + '">MetaMask</a>' +
         '<button class="phone-bar-x" aria-label="Dismiss">✕</button>';
     bar.querySelector("button").addEventListener("click", () => {
         bar.remove();
         try { sessionStorage.setItem("verity-phonebar", "1"); } catch (err) {}
     });
     document.body.appendChild(bar);
+}
+
+// Switched account inside the wallet? Update the page. (Only listen to each wallet once.)
+const listening = new Set();
+function listenToWallet(provider) {
+    if (!provider || !provider.on || listening.has(provider)) return;
+    listening.add(provider);
+    provider.on("accountsChanged", (accounts) => {
+        if (provider !== getProvider()) return;
+        if (accounts.length && currentAccount) showConnected(accounts[0]);
+        else if (!accounts.length) showDisconnected();
+    });
 }
 
 // If they connected before, show it straight away (no popup)
@@ -639,11 +669,5 @@ function showPhoneBar() {
     walletReady = true;
     document.dispatchEvent(new Event("wallet-ready"));
 
-    // Switched account in Phantom? Update the card.
-    if (provider.on) {
-        provider.on("accountsChanged", (accounts) => {
-            if (accounts.length && currentAccount) showConnected(accounts[0]);
-            else if (!accounts.length) showDisconnected();
-        });
-    }
+    listenToWallet(provider);
 })();

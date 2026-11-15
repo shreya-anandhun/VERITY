@@ -79,7 +79,9 @@ async function writeContract() {
     if (chain && Number(chain) !== 11155111) {
         await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0xaa36a7" }] }).catch(() => {});
         chain = await provider.request({ method: "eth_chainId" }).catch(() => null);
-        if (chain && Number(chain) !== 11155111) throw new Error("Your wallet isn't on the Sepolia test network. In Phantom: Settings, Developer Settings, turn on Testnet Mode, then try again.");
+        if (chain && Number(chain) !== 11155111) throw new Error(walletName() === "MetaMask"
+            ? "MetaMask isn't on the Sepolia test network. Open MetaMask, pick Sepolia from the network list (turn on Show test networks if it's hidden), then try again."
+            : "Phantom isn't on the Sepolia test network. In Phantom: Settings, Developer Settings, turn on Testnet Mode, then try again.");
     }
     const browserProvider = new ethers.BrowserProvider(provider);
     const signer = await browserProvider.getSigner();

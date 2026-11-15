@@ -2255,3 +2255,19 @@ select.field {
 .content.home.enter .h-sec { animation: homeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; --from: translateY(24px); animation-delay: 0.3s; }
 .top-wallet + .profile-wrap { margin-left: 0; }
 .fee-line { margin-bottom: 20px; line-height: 1.5; }
+
+/* ===== 32. Two-wallet chooser ===== */
+.wallet-choice { position: relative; }
+.wc-logo { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
+.wc-logo svg { width: 24px; height: 24px; stroke: none; }
+.wc-logo.phantom { background: #AB9FF2; }
+.wc-logo.phantom svg { fill: #FFFFFF; }
+.wc-logo.phantom circle { fill: #AB9FF2; }
+.wc-logo.metamask { background: #FFF1E3; }
+.wc-logo.metamask svg { fill: #F6851B; }
+.wc-go { margin-left: auto; color: var(--text-dim); font-size: 1.1rem; transition: transform 0.2s, color 0.2s; }
+.wallet-choice:hover .wc-go { transform: translateX(3px); color: var(--mint); }
+.wallet-choice.installed small { color: var(--mint); }
+.small-note { font-size: 0.82rem; margin-top: 14px; }
+.phone-bar-btn.alt { background: #F6851B; color: #FFFFFF; }
+:root[data-theme="light"] .wallet-choice.installed small, :root[data-theme="light"] .wallet-choice:hover .wc-go { color: #5B2FB8; }
