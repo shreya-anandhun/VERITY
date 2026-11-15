@@ -96,7 +96,7 @@
                             <p class="pp-address" id="ppAddress">Wallet not connected</p>
                         </div>
                     </div>
-                    <div class="pp-stats">
+                    <div class="pp-stats hidden">
                         <div><span id="statVoted">0</span><small>Polls voted</small></div>
                         <div><span id="statCreated">0</span><small>Polls created</small></div>
                     </div>
@@ -137,12 +137,15 @@
             <div class="empty-poll" id="emptyLive">Loading polls from Sepolia…</div>
         </section>
 
-        <footer class="footer">
-            <a href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report" class="report-link">
-                <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>
-                Report an issue
-            </a>
-            <span class="muted">VERITY · Built on Ethereum</span>
+        <footer class="site-foot">
+            <div class="sf-brand">
+                <b><svg viewBox="0 0 24 24"><use href="#sparkle"/></svg>VERITY</b>
+                <p>Tamper-proof polls on Ethereum. Built by Shreya Anandhun for CodeKrafters, SRM.</p>
+            </div>
+            <nav aria-label="Use VERITY"><h5>Use it</h5><a href="live.html">Live polls</a><a href="polls.html">All polls</a><a href="demo.html">Demo video</a></nav>
+            <nav aria-label="Verify VERITY"><h5>Verify it</h5><a href="https://sepolia.etherscan.io/address/0x90498Ad55b09c2b07d51e2aF703c539286F28f1d#code" target="_blank" rel="noopener">Contract on Etherscan ↗</a><a href="docs.html">Docs</a><a href="how-it-works.html">How it works</a></nav>
+            <nav aria-label="The project"><h5>Project</h5><a href="https://github.com/shreya-anandhun/VERITY" target="_blank" rel="noopener">Source on GitHub ↗</a><a href="mailto:verity.helpdesk@gmail.com?subject=VERITY%20-%20Issue%20report">Report an issue</a></nav>
+            <p class="sf-bottom">Runs on the Sepolia test network · VERITY charges no fees · No owner, no admin, no edit button</p>
         </footer>
     </main>
 
@@ -153,6 +156,7 @@
             <p class="welcome-kicker">Confirm your vote</p>
             <h2 id="confirmText">You're voting for …</h2>
             <p class="welcome-text">Votes are permanent once recorded on the blockchain. Your wallet will ask you to sign.</p>
+            <p class="fee-line" id="feeLine"></p>
             <div class="welcome-actions">
                 <button class="connect-btn" id="confirmYes">
                     <span>Yes, cast my vote</span>

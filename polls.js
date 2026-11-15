@@ -224,6 +224,7 @@ rows.addEventListener("click", (e) => {
     if (!b) return;
     const p = allPolls.find((x) => x.id === Number(b.dataset.close));
     document.getElementById("confirmNote").textContent = "Closing ends voting immediately. This cannot be undone. Your wallet will ask you to sign.";
+    showFeeEstimate(document.getElementById("feeLine"), "closePoll", [p.id]);
     ask("Close poll", `Close "${p.question}" now?`, "Yes, close it permanently", async () => {
         try {
             const r = await sendTx("close", { poll: p.question, option: null }, (c) => c.closePoll(p.id));
@@ -313,6 +314,7 @@ createForm.addEventListener("submit", (e) => {
     createModal.classList.add("hidden");
 
     document.getElementById("confirmNote").textContent = "This is recorded on the blockchain and costs a small network fee. Your wallet will ask you to sign.";
+    showFeeEstimate(document.getElementById("feeLine"), "createPoll", [question, cfCategory.value, options, BigInt(Math.floor(new Date(cfEnd.value).getTime() / 1000))]);
     ask("Create poll", `Create "${question}" with ${options.length} options?`, "Yes, create it", async () => {
         const category = cfCategory.value;
         try {

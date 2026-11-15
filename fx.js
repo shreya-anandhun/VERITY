@@ -31,8 +31,8 @@
 
     /* ---------- 2. Cards ---------- */
     // tilt + bob: tile-like cards.  glow only: cards full of controls (a moving form is annoying)
-    var TILT = ".hstat, .hhow, .act-tile, .demo-step, .live-card:not(.expanded)";
-    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .flow-step";
+    var TILT = ".hstat, .hhow, .act-tile, .demo-step, .h-step, .h-pillar, .live-card:not(.expanded)";
+    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .flow-step, .h-feature, .h-mini, .h-feed, .h-contract";
     var BOB  = ".hstat, .hhow, .act-tile, .demo-step, .live-card:not(.expanded)";
 
     // For the first few seconds after a page opens, every box slides in from the sides
@@ -126,7 +126,7 @@
         { re: /\bverif(?:y|ied|iable)\b/i, title: "Verify", def: "Check it yourself. Every vote can be looked up on a public explorer, so you don't have to take our word for it." }
     ];
     var TARGETS = [
-        ".hero-text", ".hstat .sub", ".page-sub", ".section-sub", ".set-row small", ".set-note",
+        ".hero-text", ".hero-hint", ".h-step p", ".h-pillar p", ".h-faq p", ".hstat .sub", ".page-sub", ".section-sub", ".set-row small", ".set-note",
         ".flow-text p", ".faq p", ".chain-node", ".demo-step p", ".demo-placeholder p", ".welcome-text", ".pp-note", ".empty-poll", ".tl-card .meta"
     ].join(",");
     var SKIP = "a, button, input, select, textarea, code, svg, script, style, .tip, .mono, h1, h2, h3, h4";
@@ -199,7 +199,7 @@
     bubble.innerHTML =
         '<span class="tipbubble__ring" aria-hidden="true"></span>' +
         '<span class="tipbubble__head"><svg viewBox="-10 -10 20 20" aria-hidden="true"><path fill="currentColor" d="M0 -9 C1.2 -2.4 2.4 -1.2 9 0 C2.4 1.2 1.2 2.4 0 9 C-1.2 2.4 -2.4 1.2 -9 0 C-2.4 -1.2 -1.2 -2.4 0 -9Z"/></svg><strong></strong></span>' +
-        '<p></p><span class="tipbubble__foot">VERITY decoder</span><span class="tipbubble__arrow" aria-hidden="true"></span>';
+        '<p></p><span class="tipbubble__foot">Quick definition</span><span class="tipbubble__arrow" aria-hidden="true"></span>';
     document.body.appendChild(bubble);
     var titleEl = bubble.querySelector("strong");
     var defEl = bubble.querySelector("p");

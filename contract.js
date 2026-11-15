@@ -216,6 +216,25 @@ async function loadMyVoteTxs(address) {
 }
 
 
+// The network fee for an action, before you sign it. Fills an element like <p id="feeLine">.
+// (Estimates from the public node; the wallet shows the exact amount when it asks you.)
+async function showFeeEstimate(el, method, args) {
+    if (!el) return;
+    el.innerHTML = "Network fee: <b>estimating…</b> · VERITY charges nothing";
+    try {
+        const [gas, fee] = await Promise.all([
+            readContract[method].estimateGas(...args, { from: currentAccount }),
+            readProvider.getFeeData()
+        ]);
+        const wei = gas * (fee.maxFeePerGas || fee.gasPrice || 0n);
+        const eth = Number(ethers.formatEther(wei));
+        const text = eth < 0.000001 ? "less than 0.000001" : "about " + eth.toPrecision(2);
+        el.innerHTML = `Network fee: <b>${text} test ETH</b> (free Sepolia coins) · VERITY charges nothing`;
+    } catch (err) {
+        el.innerHTML = "Network fee: <b>a tiny amount of free test ETH</b> · VERITY charges nothing";
+    }
+}
+
 // Start fetching the polls the moment this file loads, before the wallet check finishes
 loadPolls().catch(() => {});
 

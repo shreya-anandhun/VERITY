@@ -342,6 +342,7 @@ function askConfirm(pollId, optionIndex) {
     document.getElementById("confirmText").textContent =
         `You're voting for "${poll.options[optionIndex]}"`;
     confirmModal.classList.remove("hidden");
+    showFeeEstimate(document.getElementById("feeLine"), "vote", [pollId, optionIndex]);
 }
 document.getElementById("confirmNo").addEventListener("click", () => {
     confirmModal.classList.add("hidden");

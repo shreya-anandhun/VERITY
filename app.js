@@ -315,6 +315,7 @@ async function showConnected(address) {
     if (con) con.classList.remove("hidden");
 
     setText("cardAddress", shortAddress(address));
+    document.querySelectorAll(".pp-stats").forEach((el) => el.classList.remove("hidden"));
     setText("ppAddress", shortAddress(address));
     const votes = document.getElementById("ppVotes");
     if (votes) votes.innerHTML = '<li class="muted">No votes yet</li>';
@@ -352,6 +353,7 @@ function showDisconnected() {
     setText("ppAddress", "Wallet not connected");
     setText("statVoted", "0");
     setText("statCreated", "0");
+    document.querySelectorAll(".pp-stats").forEach((el) => el.classList.add("hidden"));   // no "0 polls voted" before you've connected
     const votes = document.getElementById("ppVotes");
     if (votes) votes.innerHTML = '<li class="muted">Connect your wallet to see your votes</li>';
 
