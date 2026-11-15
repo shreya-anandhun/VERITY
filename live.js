@@ -86,7 +86,13 @@ async function loadLive() {
     document.body.classList.toggle("poll-open", openId !== null);
     document.querySelector(".content").classList.remove("waiting");
     render();
+    // Arrived with ?poll=N (a shared link or QR code)? Bring that poll into view, once
+    if (openId !== null && !scrolledToWanted) {
+        const card = grid.querySelector(".expanded");
+        if (card) { scrolledToWanted = true; setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "start" }), 300); }
+    }
 }
+let scrolledToWanted = false;
 
 function render() {
     const shown = ranked.filter((p) => matchesSearch(p) || p.id === openId);
@@ -106,7 +112,7 @@ function render() {
 
         // Collapsed card
         if (!isOpen) {
-            const showBars = voted !== undefined || getSetting("showResults", false);
+            const showBars = voted !== undefined;
             const meta = `${p.category || "Other"} · by ${currentAccount && p.creator && p.creator.toLowerCase() === currentAccount.toLowerCase() ? "You" : shortAddress(p.creator || "0x0000000000000000000000000000000000000000")} · ${p.options.length} options · <b>${total.toLocaleString("en-IN")} ${total === 1 ? "vote" : "votes"}</b>`;
             if (voted !== undefined) {
                 // Already voted: show the result right here
@@ -143,7 +149,7 @@ function render() {
                         Vote
                         <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                     </button>
-                    <span class="muted why-line">${showBars ? "Results are shown" : 'Results shown after you vote · <a href="how-it-works.html">why?</a>'}</span>
+                    <span class="muted why-line">${showBars ? "Results are shown" : 'Results shown after you vote · <a href="how-it-works.html#why-results">why?</a>'}</span>
                 </div>
                 <div class="card-actions tools-only">${tools(p.id)}</div>
             </article>`;
@@ -153,7 +159,7 @@ function render() {
         const optionsHTML = p.options.map((opt, i) => {
             const percent = pct(p.votes[i], total);
             const mine = voted === i;
-            const showBars = voted !== undefined || getSetting("showResults", false);
+            const showBars = voted !== undefined;
             return `
             <button class="option ${showBars ? "has-result" : ""} ${voted !== undefined ? "locked" : ""} ${mine ? "mine" : ""}"
                     data-vote="${i}" aria-label="${voted !== undefined ? "Result: " : "Vote for "}${escapeHTML(opt)}" ${voted !== undefined ? 'aria-disabled="true"' : ""}>
@@ -379,6 +385,7 @@ document.getElementById("confirmYes").addEventListener("click", async () => {
         toast(err.message, "bad");
     }
     sending = null;
+    try { await loadPolls(true); } catch (err) {}      // fetch the fresh tallies first, so the card updates at once
     await loadLive();
 });
 

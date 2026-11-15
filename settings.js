@@ -18,7 +18,7 @@ themePick.addEventListener("click", (e) => {
 markTheme();
 
 /* Toggles: each switch is saved under its own key */
-const switches = { notifEnds: true, notifFirst: true, confirmVotes: true, showResults: false };   // key -> default
+const switches = { notifEnds: true, notifFirst: true, confirmVotes: true };   // key -> default
 Object.entries(switches).forEach(([id, def]) => {
     const el = document.getElementById(id);
     el.checked = getSetting(id, def);

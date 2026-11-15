@@ -19,6 +19,7 @@
     <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"dark";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
+    <a class="skip-link" href="#mainContent">Skip to content</a>
 
     <svg width="0" height="0" style="position:absolute">
         <symbol id="sparkle" viewBox="-1 -1 2 2">
@@ -72,7 +73,7 @@
     <div class="overlay" id="overlay"></div>
 
     <!-- ============ MAIN ============ -->
-    <main class="main main-wide">
+    <main class="main main-wide" id="mainContent">
 
         <header class="topbar">
             <button class="menu-btn" id="menuBtn" aria-label="Open menu">
@@ -126,7 +127,7 @@
                     <div class="flow-text">
                         <span class="flow-num">01</span>
                         <h3>Connect your wallet</h3>
-                        <p>Click <b>Connect Wallet</b>. Your wallet (Phantom, or MetaMask) opens its own window and asks you to approve. VERITY only ever sees your public address, never your password or keys.</p>
+                        <p>Click <b>Connect Wallet</b>. Phantom opens its own window and asks you to approve. VERITY only ever sees your public address, never your password or keys.</p>
                     </div>
                 </li>
                 <li class="flow-step">
@@ -166,7 +167,7 @@
                     <div class="flow-text">
                         <span class="flow-num">05</span>
                         <h3>Verify it, anywhere</h3>
-                        <p>Every vote gets a transaction hash. Paste it on <b>Transactions</b> or open it on Etherscan to see exactly what was recorded, from any computer, without trusting VERITY.</p>
+                        <p>Every vote gets a transaction hash. Paste it on <b>My Activity</b> or open it on Etherscan to see exactly what was recorded, from any computer, without trusting VERITY.</p>
                     </div>
                 </li>
             </ol>
@@ -192,11 +193,11 @@
             <!-- ===== 3. QUICK ANSWERS ===== -->
             <div class="faq">
                 <p class="welcome-kicker">Quick answers</p>
-                <details><summary>Why can I only vote once?</summary><p>The contract keeps a list of which wallets have voted in each poll. A second vote from the same wallet is rejected before it's recorded, so it shows up as <b>Failed</b> on Transactions.</p></details>
+                <details><summary>Why can I only vote once?</summary><p>The contract keeps a list of which wallets have voted in each poll. A second vote from the same wallet is rejected before it's recorded, so it shows up as <b>Failed</b> on My Activity.</p></details>
                 <details><summary>Is my vote anonymous?</summary><p>Your wallet <b>address</b> is public with your vote, but nothing links that address to your name unless you share it. VERITY never asks for personal details; your display name stays in your own browser.</p></details>
                 <details><summary>What is the "network fee"?</summary><p>Every blockchain transaction costs a little ETH to process. VERITY runs on <b>Sepolia</b>, a test network, so the ETH is free from a faucet and has no real value.</p></details>
                 <details><summary>Can a vote be changed or deleted?</summary><p>No. Once a block is confirmed, changing it would mean rewriting the whole chain across thousands of computers. That permanence is the point.</p></details>
-                <details><summary>Why can't I see results before voting?</summary><p>On purpose. Hiding the tally until you've voted stops people from just joining the crowd. The counts are still public: anyone can read them from the contract on Etherscan at any time, and they appear on VERITY the moment the poll ends.</p></details>
+                <details id="why-results"><summary>Why can't I see results before voting?</summary><p>On purpose. Hiding the tally until you've voted stops people from just joining the crowd. The counts are still public: anyone can read them from the contract on Etherscan at any time, and they appear on VERITY the moment the poll ends.</p></details>
                 <details><summary>Could someone vote twice with two wallets?</summary><p>Yes. "One wallet, one vote" means one <b>wallet</b>, and a person can create several. That's acceptable for club polls among people who know each other; it's not a system for high-stakes elections. A stricter version would check membership before letting a wallet vote.</p></details>
                 <details><summary>What if the website goes down?</summary><p>The votes are still on Sepolia. Anyone can read the contract directly on Etherscan, so the results exist independently of VERITY.</p></details>
             </div>
@@ -212,12 +213,12 @@
     </main>
 
     <!-- ============ CONNECT WALLET POPUP ============ -->
-    <div class="welcome-backdrop hidden" id="connectModal">
+    <div class="welcome-backdrop hidden" id="connectModal" role="dialog" aria-modal="true" aria-label="Connect your wallet">
         <div class="welcome-box">
             <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
             <p class="welcome-kicker">Connect wallet</p>
             <h2>Do you already use <span data-wallet-name>Phantom</span>?</h2>
-            <p class="welcome-text">VERITY works with Phantom (recommended) or MetaMask. Your wallet opens its own window to unlock and approve, so VERITY never sees your password.</p>
+            <p class="welcome-text">VERITY works with the Phantom wallet. Phantom opens its own window to unlock and approve, so VERITY never sees your password.</p>
 
             <div class="wallet-choices">
                 <button class="wallet-choice" id="connectHave">
@@ -250,5 +251,12 @@
     <script src="contract.js"></script>
     
     <script src="fx.js"></script>
+    <script>
+        // A link like how-it-works.html#why-results opens that FAQ answer directly
+        if (/^#[\w-]+$/.test(location.hash)) {
+            const d = document.getElementById(location.hash.slice(1));
+            if (d && d.tagName === "DETAILS") { d.open = true; setTimeout(() => d.scrollIntoView({ block: "center", behavior: "smooth" }), 150); }
+        }
+    </script>
 </body>
 </html>

@@ -18,7 +18,7 @@
     var seed = 0, path = location.pathname;
     for (var c = 0; c < path.length; c++) seed = (seed * 31 + path.charCodeAt(c)) >>> 0;
     function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
-    var count = small.matches ? 5 : 10;
+    var count = small.matches ? 3 : 6;
     for (var n = 0; n < count; n++) {
         var x = small.matches ? rnd() * 92 + 2 : rnd() * 78 + 20;      // keep clear of the sidebar
         html += '<span class="fx-spark" style="--x:' + x.toFixed(1) + '%;--y:' + (rnd() * 90 + 3).toFixed(1) +

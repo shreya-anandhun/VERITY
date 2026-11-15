@@ -20,6 +20,7 @@
     <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"dark";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
+    <a class="skip-link" href="#mainContent">Skip to content</a>
 
     <!-- Splash screen (first open of the session) -->
     <div class="splash" id="splash">
@@ -83,7 +84,7 @@
     <div class="overlay" id="overlay"></div>
 
     <!-- ============ MAIN AREA ============ -->
-    <main class="main main-wide">
+    <main class="main main-wide" id="mainContent">
 
         <!-- Top bar -->
         <header class="topbar">
@@ -160,7 +161,7 @@
 
                 <!-- Daily welcome message (changes every 24 hours) -->
                 <p class="hero-greet" id="cardGreeting"></p>
-                <p class="hero-net"><span class="card-network" id="cardNetwork">Sepolia</span></p>
+                <p class="hero-net"><span class="card-network" id="cardNetwork">Testnet · Sepolia</span></p>
             </div>
 
             <!-- 2. LIVE NUMBERS + HOW IT WORKS -->
@@ -199,7 +200,7 @@
     </main>
 
     <!-- ============ FIRST-VISIT WELCOME ============ -->
-    <div class="welcome-backdrop hidden" id="welcomeModal">
+    <div class="welcome-backdrop hidden" id="welcomeModal" role="dialog" aria-modal="true" aria-label="Welcome to VERITY">
         <div class="welcome-box">
             <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
 
@@ -247,12 +248,12 @@
     </div>
 
     <!-- ============ CONNECT WALLET POPUP ============ -->
-    <div class="welcome-backdrop hidden" id="connectModal">
+    <div class="welcome-backdrop hidden" id="connectModal" role="dialog" aria-modal="true" aria-label="Connect your wallet">
         <div class="welcome-box">
             <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
             <p class="welcome-kicker">Connect wallet</p>
             <h2>Do you already use <span data-wallet-name>Phantom</span>?</h2>
-            <p class="welcome-text">VERITY works with Phantom (recommended) or MetaMask. Your wallet opens its own window to unlock and approve, so VERITY never sees your password.</p>
+            <p class="welcome-text">VERITY works with the Phantom wallet. Phantom opens its own window to unlock and approve, so VERITY never sees your password.</p>
 
             <div class="wallet-choices">
                 <button class="wallet-choice" id="connectHave">

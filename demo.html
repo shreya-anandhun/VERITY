@@ -19,6 +19,7 @@
     <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"dark";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
+    <a class="skip-link" href="#mainContent">Skip to content</a>
 
     <svg width="0" height="0" style="position:absolute">
         <symbol id="sparkle" viewBox="-1 -1 2 2">
@@ -72,7 +73,7 @@
     <div class="overlay" id="overlay"></div>
 
     <!-- ============ MAIN ============ -->
-    <main class="main main-wide">
+    <main class="main main-wide" id="mainContent">
 
         <header class="topbar">
             <button class="menu-btn" id="menuBtn" aria-label="Open menu">
@@ -115,9 +116,9 @@
                  or <video src="demo.mp4" controls></video> -->
             <div class="demo-video" id="demoVideo">
                 <div class="demo-placeholder">
-                    <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    <button type="button" class="play" id="demoPlay" aria-label="Play the demo video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
                     <h3>Demo video coming soon</h3>
-                    <p>A 60-second walkthrough of casting and verifying a vote on VERITY.<br>Until then, try it yourself below. It only costs a little test ETH.</p>
+                    <p>A walkthrough of casting and verifying a vote on VERITY is being filmed.<br>Until then, try it yourself below. It only costs a little test ETH.</p>
                 </div>
             </div>
 
@@ -155,12 +156,12 @@
     </main>
 
     <!-- ============ CONNECT WALLET POPUP ============ -->
-    <div class="welcome-backdrop hidden" id="connectModal">
+    <div class="welcome-backdrop hidden" id="connectModal" role="dialog" aria-modal="true" aria-label="Connect your wallet">
         <div class="welcome-box">
             <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
             <p class="welcome-kicker">Connect wallet</p>
             <h2>Do you already use <span data-wallet-name>Phantom</span>?</h2>
-            <p class="welcome-text">VERITY works with Phantom (recommended) or MetaMask. Your wallet opens its own window to unlock and approve, so VERITY never sees your password.</p>
+            <p class="welcome-text">VERITY works with the Phantom wallet. Phantom opens its own window to unlock and approve, so VERITY never sees your password.</p>
 
             <div class="wallet-choices">
                 <button class="wallet-choice" id="connectHave">
@@ -191,6 +192,10 @@
     <script src="ethers.umd.min.js"></script>
     <script src="app.js"></script>
     <script src="contract.js"></script>
-        <script src="fx.js"></script>
+    <script src="fx.js"></script>
+    <script>
+        document.getElementById("demoPlay").addEventListener("click", () =>
+            toast("The demo video is being filmed — it'll appear right here soon. Try it live below instead.", ""));
+    </script>
 </body>
 </html>

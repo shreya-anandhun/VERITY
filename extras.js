@@ -261,7 +261,13 @@
         } catch (err) {
             if (!stillOpen) return;
             $("#xrFound").textContent = "Couldn't finish the recount";
-            $("#xrFeed").innerHTML = `<p class="muted" style="padding:14px 0">${esc((err.shortMessage || err.message || "Network error").slice(0, 120))}. Close this and try again.</p>`;
+            $("#xrProg").style.width = "100%";
+            $("#xrProg").style.background = "#E25656";
+            $("#xrFeed").innerHTML = `<div class="xr-fail">
+                <p>The public Sepolia node didn't answer: ${esc((err.shortMessage || err.message || "network error").slice(0, 110))}.<br>This is the node's fault, not the votes' — they're safe on-chain.</p>
+                <button class="small-btn fill" id="xrRetry">Retry the recount</button></div>`;
+            const retry = $("#xrRetry");
+            if (retry) retry.onclick = () => { modal.close(); recount(id); };
         }
     }
 

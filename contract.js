@@ -290,7 +290,7 @@ async function blockTime(bn) {
 /* ---------- Toast (small message bottom-centre) ---------- */
 function toast(text, kind = "") {
     let el = document.getElementById("toast");
-    if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; document.body.appendChild(el); }
+    if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
     el.textContent = text;
     el.className = "toast show " + kind;
     clearTimeout(el._t);

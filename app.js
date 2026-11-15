@@ -100,51 +100,51 @@ nameInput.addEventListener("input", () => {
 // <user> gets replaced with the person's first name
 const greetings = {
     0: [ // Sunday
-        "A little peace before the next adventure <user>.",
-        "Reset, recharge, repeat <user>.",
-        "Sundays are for new perspectives <user>.",
-        "Take a breath <user>. You've earned it."
+        "A little peace before the next adventure, <user>.",
+        "Reset, recharge, repeat, <user>.",
+        "Sundays are for new perspectives, <user>.",
+        "Take a breath, <user>. You've earned it."
     ],
     1: [ // Monday
-        "New week. New energy. Let's get into it <user>.",
-        "Mondays aren't so bad when you're here <user>.",
+        "New week. New energy. Let's get into it, <user>.",
+        "Mondays aren't so bad when you're here, <user>.",
         "Fresh start. Same great you, <user>.",
         "Time to make this week count, <user>."
     ],
     2: [ // Tuesday
-        "Tuesday looks better with you around <user>.",
-        "Keep the energy going <user>!",
-        "Another day, another possibility <user>.",
-        "You're doing better than you think <user>!"
+        "Tuesday looks better with you around, <user>.",
+        "Keep the energy going, <user>!",
+        "Another day, another possibility, <user>.",
+        "You're doing better than you think, <user>!"
     ],
     3: [ // Wednesday
-        "Halfway there <user>. Keep shining.",
-        "Midweek check-in: you're doing great <user>!",
-        "A little progress goes a long way <user>.",
-        "Make today worth remembering <user>."
+        "Halfway there, <user>. Keep shining.",
+        "Midweek check-in: you're doing great, <user>!",
+        "A little progress goes a long way, <user>.",
+        "Make today worth remembering, <user>."
     ],
     4: [ // Thursday
-        "Almost there <user>. Don't lose the spark.",
-        "Good things are taking shape <user>.",
+        "Almost there, <user>. Don't lose the spark.",
+        "Good things are taking shape, <user>.",
         "Thursday called. It said keep going, <user>.",
         "You're right where you need to be, <user>."
     ],
     5: [ // Friday
-        "It's Friday <user>. Make it count.",
-        "Main character energy. All day <user>.",
-        "End the week on your own terms <user>.",
-        "Friday feels a little more exciting with you <user>."
+        "It's Friday, <user>. Make it count.",
+        "Main character energy. All day, <user>.",
+        "End the week on your own terms, <user>.",
+        "Friday feels a little more exciting with you, <user>."
     ],
     6: [ // Saturday
-        "Slow down. Show up. Enjoy the moment <user>.",
-        "Your weekend starts here <user>.",
-        "Today has potential <user>. Go explore it.",
-        "No rush <user>. Just good vibes."
+        "Slow down. Show up. Enjoy the moment, <user>.",
+        "Your weekend starts here, <user>.",
+        "Today has potential, <user>. Go explore it.",
+        "No rush, <user>. Just good vibes."
     ]
 };
 const bonusGreetings = [
-    "You're back <user>! We saved you a little magic.",
-    "The world is yours to explore <user>. Let's go."
+    "You're back, <user>! We saved you a little magic.",
+    "The world is yours to explore, <user>. Let's go."
 ];
 
 function showGreeting() {

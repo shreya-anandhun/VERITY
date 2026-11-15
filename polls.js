@@ -201,10 +201,11 @@ if (wantedPoll !== null) {
 const confirmModal = document.getElementById("confirmModal");
 let onConfirm = null;
 
-function ask(kicker, text, yesText, fn) {
+function ask(kicker, text, yesText, fn, danger = false) {
     document.getElementById("confirmKicker").textContent = kicker;
     document.getElementById("confirmText").textContent = text;
     document.getElementById("confirmYesText").textContent = yesText;
+    document.getElementById("confirmYes").classList.toggle("danger", danger);   // red for irreversible actions
     onConfirm = fn;
     confirmModal.classList.remove("hidden");
 }
@@ -229,7 +230,7 @@ rows.addEventListener("click", (e) => {
             if (r) toast("Poll closed ✓", "good");
         } catch (err) { toast(err.message, "bad"); }
         await loadAll();
-    });
+    }, true);
 });
 
 
@@ -260,9 +261,13 @@ function resetCreateForm() {
     const pad = (n) => String(n).padStart(2, "0");
     cfEnd.min = `${min.getFullYear()}-${pad(min.getMonth() + 1)}-${pad(min.getDate())}T${pad(min.getHours())}:${pad(min.getMinutes())}`;
 }
+function formHasText() {
+    return !![document.getElementById("cfQuestion"), ...cfOptions.querySelectorAll("input")].find((i) => i.value.trim());
+}
 document.getElementById("createBtn").addEventListener("click", async () => {
     if (!currentAccount) { openConnectModal(); return; }
-    resetCreateForm();
+    // Closing the form (Escape included) keeps what was typed; it only starts blank when empty
+    if (!formHasText()) resetCreateForm();
     createModal.classList.remove("hidden");
     document.getElementById("cfQuestion").focus();
 });
@@ -298,6 +303,8 @@ createForm.addEventListener("submit", (e) => {
 
     const err = document.getElementById("cfError");
     err.classList.add("hidden");
+    if (!question) { err.textContent = "Give your poll a question."; err.classList.remove("hidden"); return; }
+    if (!cfEnd.value) { err.textContent = "Pick when the poll should end."; err.classList.remove("hidden"); return; }
     if (options.length < 2) { err.textContent = "Add at least two options."; err.classList.remove("hidden"); return; }
     if (new Set(options.map((o) => o.toLowerCase())).size !== options.length) {
         err.textContent = "Two options are the same. Make each one different."; err.classList.remove("hidden"); return;
@@ -319,7 +326,7 @@ createForm.addEventListener("submit", (e) => {
                     render();
                     toast("Poll sent to Sepolia. Confirming… (about 15 seconds)", "");
                 });
-            if (r) { toast("Poll created on Sepolia ✓", "good"); statusSel.value = "mine"; sortSel.value = "newest"; }
+            if (r) { toast("Poll created on Sepolia ✓", "good"); statusSel.value = "mine"; sortSel.value = "newest"; resetCreateForm(); }
         } catch (err) { toast(err.message, "bad"); }
         await loadAll();
     });

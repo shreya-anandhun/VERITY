@@ -64,10 +64,13 @@ async function loadHistory() {
     const me = currentAccount;
     const polls = await loadPolls();
     const list = [];
-    const [votedEvs, createdEvs] = await Promise.all([
+    let [votedEvs, createdEvs] = await Promise.all([
         queryEvents(readContract.filters.Voted(null, me)),
         queryEvents(readContract.filters.PollCreated(null, me))
     ]);
+    // Polls hidden from the site are left out here too, so every page agrees on the counts
+    votedEvs = votedEvs.filter((ev) => !HIDDEN_POLLS.includes(Number(ev.args.pollId)));
+    createdEvs = createdEvs.filter((ev) => !HIDDEN_POLLS.includes(Number(ev.args.pollId)));
     for (const ev of votedEvs) {
         const p = polls.find((x) => x.id === Number(ev.args.pollId));
         list.push({ hash: ev.transactionHash, type: "vote", status: "confirmed", block: ev.blockNumber,

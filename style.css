@@ -1868,7 +1868,9 @@ select.field {
 .voted-card { border-color: rgba(187, 255, 216, 0.5); }
 :root[data-theme="light"] .voted-card { border-color: #7E4FD8; }
 .mini-bars { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-.mini-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 6px; }
+.mini-row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.8rem; margin-top: 6px; }
+.mini-row span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.mini-row span:last-child { flex: none; }
 .mini-row .mine-tag { color: var(--mint); font-weight: 500; }
 :root[data-theme="light"] .mini-row .mine-tag { color: #5B2FB8; }
 .mini-bar { height: 7px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
@@ -1949,7 +1951,7 @@ select.field {
 .hero-grid { display: grid; grid-template-columns: 1fr 1fr 0.9fr; gap: 22px; margin: 40px 0 28px; align-items: stretch; }
 .hstat { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 30px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); position: relative; overflow: hidden; color: var(--white); transition: box-shadow 0.3s, border-color 0.3s; }
 .hstat:hover { box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 28px rgba(187, 255, 216, 0.10); }
-.hstat.accent { background: linear-gradient(120deg, #C8FEDA 0%, #C8FEDA 55%, #9FE8BF 100%); color: var(--surface); }
+.hstat.accent { background: linear-gradient(120deg, #A9EFC6 0%, #A9EFC6 50%, #7FD9A8 100%); color: var(--surface); }
 .hstat .num { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .hstat b { font-family: var(--font-head); font-weight: 600; font-size: 3.6rem; line-height: 1; color: var(--mint); }
 .hstat.accent b { color: var(--surface); }
@@ -2046,3 +2048,34 @@ select.field {
 :root[data-theme="light"] .phone-bar-btn { background: #7E4FD8; color: #FFFFFF; }
 #connectNoExt a { color: var(--mint); text-decoration: underline; text-underline-offset: 3px; }
 :root[data-theme="light"] #connectNoExt a { color: #5B2FB8; }
+
+/* ===== 29. Review-round fixes ===== */
+/* Destructive actions (closing a poll) get a red confirm button */
+#confirmYes.danger { background: #E25656; border-color: #E25656; color: #FFFFFF; }
+#confirmYes.danger:hover { background: #C84040; box-shadow: 0 0 16px rgba(226, 86, 86, 0.45); }
+:root[data-theme="light"] .close-poll { border-color: #E8B0B0; color: #B83232; }
+:root[data-theme="light"] .close-poll:hover { background: rgba(214, 69, 69, 0.08); }
+
+/* The selected theme is unmistakable in both themes */
+.theme-opt.on::after { content: "✓ Selected"; font-size: 0.72rem; font-weight: 600; color: var(--mint); }
+:root[data-theme="light"] .theme-opt.on { border-color: #7E4FD8; background: #F4EEFC; color: #111518; box-shadow: 0 0 0 1.5px rgba(126, 79, 216, 0.4); }
+:root[data-theme="light"] .theme-opt.on::after { color: #5B2FB8; }
+
+/* Light-theme contrast */
+:root[data-theme="light"] { --text-dim: rgba(17, 21, 24, 0.68); }
+.form-error { color: #FF9C9C; font-weight: 500; }
+:root[data-theme="light"] .form-error { color: #B32E2E; }
+
+/* Decorative sparkles stay behind the words */
+.content.home > .spark { z-index: 0; }
+.hero, .hero-grid { position: relative; z-index: 1; }
+.page-head, .page-intro { position: relative; z-index: 1; }
+
+/* Keyboard users can skip straight past the menu */
+.skip-link { position: fixed; left: 14px; top: -64px; z-index: 600; padding: 10px 18px; border-radius: 999px; background: var(--mint); color: var(--surface); font-weight: 500; transition: top 0.2s; }
+.skip-link:focus { top: 14px; }
+:root[data-theme="light"] .skip-link { color: #FFFFFF; }
+
+/* Recount: a clear error state with a retry */
+.xr-fail { display: grid; gap: 14px; justify-items: start; padding: 18px 2px; }
+.xr-fail p { margin: 0; color: var(--fx-faint, var(--text-dim)); font-size: 0.9rem; line-height: 1.5; }
