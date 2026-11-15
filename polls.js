@@ -356,3 +356,20 @@ createForm.addEventListener("submit", (e) => {
 document.addEventListener("wallet-connected", () => loadAll());
 document.addEventListener("wallet-disconnected", () => { if (statusSel.value === "mine") statusSel.value = "all"; loadAll(); });
 document.addEventListener("polls-fresh", () => loadAll());
+
+
+// Home's "Create a poll" button links here with ?create=1: open the form straight away
+// (or the wallet chooser first, then the form once a wallet connects)
+(function openCreateFromLink() {
+    const params = new URLSearchParams(location.search);
+    if (params.get("create") !== "1") return;
+    params.delete("create");
+    history.replaceState(null, "", location.pathname + (params.toString() ? "?" + params : "") + location.hash);
+    const btn = document.getElementById("createBtn");
+    const go = () => {
+        if (!currentAccount) document.addEventListener("wallet-connected", () => setTimeout(() => btn.click(), 300), { once: true });
+        btn.click();
+    };
+    if (typeof walletReady !== "undefined" && walletReady) go();
+    else document.addEventListener("wallet-ready", go, { once: true });
+})();
