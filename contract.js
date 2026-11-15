@@ -334,6 +334,7 @@ async function loadHome() {
         setText("totalPolls", polls.length);
         setText("totalVotes", polls.reduce((n, p) => n + p.totalVotes, 0).toLocaleString("en-IN"));
         setText("liveWord", live.length === 1 ? "poll" : "polls");
+        document.querySelectorAll(".num-wait").forEach((el) => el.classList.remove("num-wait"));   // real numbers are in
 
         if (!pollCard) return;                       // Home no longer shows a featured poll
         if (!live.length) {
@@ -364,5 +365,7 @@ async function loadHome() {
 }
 loadHome();
 document.addEventListener("polls-fresh", loadHome);
+// A poll can cross its end time while you're looking at the page: keep the live count honest
+setInterval(() => { if (pollsCache && document.getElementById("liveCount")) loadHome(); }, 60000);
 document.addEventListener("wallet-connected", loadHome);
 document.addEventListener("wallet-disconnected", loadHome);

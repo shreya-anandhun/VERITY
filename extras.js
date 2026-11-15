@@ -205,11 +205,13 @@
 
         try {
             // 1. every Voted event for this poll, and what the contract itself reports
-            const [events, poll, latest] = await Promise.all([
+            // If the node hangs, give up after 25 seconds and show the retry button instead
+            const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("it took more than 25 seconds")), 25000));
+            const [events, poll, latest] = await Promise.race([Promise.all([
                 queryEvents(readContract.filters.Voted(id)),
                 getPoll(id, true),
                 readProvider.getBlockNumber()
-            ]);
+            ]), timeout]);
             if (!stillOpen) return;
             if (!poll) throw new Error("Poll not found");
             const tally = poll.options.map(() => 0);

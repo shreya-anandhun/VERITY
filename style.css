@@ -1886,7 +1886,16 @@ select.field {
 :root[data-theme="light"] .sk { background: linear-gradient(90deg, #EEE9F8, #F7F5FC, #EEE9F8); background-size: 200% 100%; }
 .sk.w1 { width: 60px; } .sk.w2 { width: 45%; } .sk.w3 { width: 80%; height: 18px; }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-.poll-grid { align-items: start; }
+/* Cards in the same row match heights, with the buttons lined up along the bottom */
+.poll-grid { align-items: stretch; }
+.live-card { display: flex; flex-direction: column; }
+.live-card .card-actions { margin-top: auto; padding-top: 10px; }
+.live-card.expanded { display: block; }
+
+/* Home stats: a quiet pulse until the real numbers arrive from the chain */
+.num-wait { animation: numWait 1.3s ease-in-out infinite; }
+@keyframes numWait { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .num-wait { animation: none; opacity: 0.5; } }
 
 /* ===== 25. Home stat buttons + entrance animation ===== */
 .stat-btn {

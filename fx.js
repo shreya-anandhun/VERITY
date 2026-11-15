@@ -20,7 +20,8 @@
     function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
     var count = small.matches ? 3 : 6;
     for (var n = 0; n < count; n++) {
-        var x = small.matches ? rnd() * 92 + 2 : rnd() * 78 + 20;      // keep clear of the sidebar
+        // Desktop: sparkles live in the gutters either side of the content, never over buttons
+        var x = small.matches ? rnd() * 92 + 2 : (n % 2 ? 85 + rnd() * 10 : 16.5 + rnd() * 4.5);
         html += '<span class="fx-spark" style="--x:' + x.toFixed(1) + '%;--y:' + (rnd() * 90 + 3).toFixed(1) +
                 '%;--s:' + (0.45 + rnd() * 0.75).toFixed(2) + ';--d:' + (rnd() * 6).toFixed(2) + 's;--t:' +
                 (2.6 + rnd() * 1.4).toFixed(2) + 's;--f:' + (6 + rnd() * 3).toFixed(1) + 's"><i></i></span>';

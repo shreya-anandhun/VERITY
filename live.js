@@ -40,7 +40,7 @@ let sortMode = "votes";
 function rankPolls() {
     const r = [...livePolls];
     if (sortMode === "ending") r.sort((a, b) => a.endTime - b.endTime);
-    else if (sortMode === "newest") r.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0) || b.id - a.id);
+    else if (sortMode === "newest") r.sort((a, b) => b.id - a.id);   // ids are given in creation order on-chain, so this is always right
     else r.sort((a, b) => pollTotal(b) - pollTotal(a));
     return r;
 }
