@@ -1,0 +1,157 @@
+WEBVTT
+
+1
+00:00:00.150 --> 00:00:03.512
+This is VERITY. Tamper-proof polls on Ethereum
+
+2
+00:00:03.592 --> 00:00:06.654
+— where every vote is a public record that
+
+3
+00:00:06.734 --> 00:00:09.797
+nobody can change. Not even the person who
+
+4
+00:00:09.877 --> 00:00:10.470
+built it.
+
+5
+00:00:11.020 --> 00:00:14.085
+There are no accounts, and no passwords.
+
+6
+00:00:14.165 --> 00:00:16.365
+Your wallet is your identity.
+
+7
+00:00:16.445 --> 00:00:19.746
+I'll connect Phantom... and that's the only
+
+8
+00:00:19.826 --> 00:00:21.790
+sign-in VERITY ever needs.
+
+9
+00:00:22.670 --> 00:00:25.971
+Live Polls shows everything that's open right
+
+10
+00:00:26.051 --> 00:00:28.076
+now. Let's vote on this one.
+
+11
+00:00:28.156 --> 00:00:31.156
+VERITY shows the exact network fee before
+
+12
+00:00:31.236 --> 00:00:34.538
+anything is signed — a fraction of a cent, in
+
+13
+00:00:34.618 --> 00:00:35.590
+free test ETH.
+
+14
+00:00:36.670 --> 00:00:39.815
+My wallet signs it... and in a few seconds,
+
+15
+00:00:39.895 --> 00:00:42.140
+it's written to the blockchain.
+
+16
+00:00:43.820 --> 00:00:45.747
+Only now do I see the results.
+
+17
+00:00:45.827 --> 00:00:48.823
+They stay hidden until you've voted, so nobody
+
+18
+00:00:48.903 --> 00:00:51.766
+just follows the crowd. And every vote comes
+
+19
+00:00:51.846 --> 00:00:54.241
+with a receipt that links straight to
+
+20
+00:00:54.321 --> 00:00:54.910
+Etherscan.
+
+21
+00:00:55.790 --> 00:00:58.260
+Creating a poll takes about a minute.
+
+22
+00:00:58.340 --> 00:01:01.431
+A question, a category, up to ten options, and
+
+23
+00:01:01.511 --> 00:01:04.533
+an end time. The contract itself enforces the
+
+24
+00:01:04.613 --> 00:01:07.566
+limits — so a bad poll is rejected before it
+
+25
+00:01:07.646 --> 00:01:08.600
+costs anything.
+
+26
+00:01:09.580 --> 00:01:13.770
+One signature... and it's live for everyone.
+
+27
+00:01:15.450 --> 00:01:18.031
+Every poll has its own link and QR code.
+
+28
+00:01:18.111 --> 00:01:20.891
+Press Recount, and your own browser re-adds
+
+29
+00:01:20.971 --> 00:01:23.751
+every vote from the blockchain, then checks
+
+30
+00:01:23.831 --> 00:01:25.813
+the total against the contract.
+
+31
+00:01:25.893 --> 00:01:28.540
+You never have to trust VERITY's numbers.
+
+32
+00:01:29.620 --> 00:01:32.412
+My Activity keeps a timeline of everything
+
+33
+00:01:32.492 --> 00:01:34.805
+you've done, with the fee for each.
+
+34
+00:01:34.885 --> 00:01:37.950
+Docs explains the contract — which is verified
+
+35
+00:01:38.030 --> 00:01:40.890
+on Etherscan. And About tells you who built
+
+36
+00:01:40.970 --> 00:01:41.710
+it, and why.
+
+37
+00:01:42.690 --> 00:01:46.595
+No owner. No admin. No edit button.
+
+38
+00:01:46.675 --> 00:01:50.921
+Just votes you can check for yourself.
+
+39
+00:01:51.001 --> 00:01:55.020
+VERITY: vote once... verify forever.
