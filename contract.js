@@ -36,7 +36,14 @@ const LIMITS = { title: 200, category: 32, option: 100, minOptions: 2, maxOption
 
 // Polls hidden from the site (they still exist on-chain; nothing can delete them).
 // Add a poll's ID here to stop VERITY showing it anywhere.
-const HIDDEN_POLLS = [1];   // #1 is an accidental duplicate of #0
+const HIDDEN_POLLS = [1];   // #1 is an accidental duplicate of #0. Reported polls that break the Terms are added here (on-chain they still exist).
+// Polls this person chose to hide on this device (from the Report popup). Settings can clear it.
+function hiddenByUser() { try { return JSON.parse(localStorage.getItem("verity-hidden")) || []; } catch (e) { return []; } }
+function hidePollForMe(id) {
+    const list = hiddenByUser(); if (!list.includes(id)) list.push(id);
+    localStorage.setItem("verity-hidden", JSON.stringify(list));
+    try { localStorage.removeItem("verity-polls-last"); sessionStorage.removeItem("verity-polls-cache"); } catch (e) {}
+}
 
 // Public Sepolia nodes for READING (works even with no wallet connected).
 // We talk to one node at a time; if it errors, we move to the next in the list.
@@ -61,7 +68,7 @@ async function withFailover(fn) {
         try { return await fn(); }
         catch (err) {
             if (attempt >= SEPOLIA_RPCS.length) throw err;
-            console.log("RPC failed, switching node:", err.shortMessage || err.message);
+            debugLog("RPC failed, switching node:", err.shortMessage || err.message);
             useRpc((rpcIndex + 1) % SEPOLIA_RPCS.length);   // go round the list, back to the first if needed
         }
     }
@@ -133,7 +140,7 @@ function refreshPollsQuietly() {
     const before = JSON.stringify(pollsCache);
     refreshing = loadPolls(true)
         .then((fresh) => { if (JSON.stringify(fresh) !== before) document.dispatchEvent(new Event("polls-fresh")); })
-        .catch((err) => console.log("Background refresh failed", err))
+        .catch((err) => debugLog("Background refresh failed", err))
         .finally(() => { refreshing = null; });
     return refreshing;
 }
@@ -175,7 +182,8 @@ async function fetchPolls() {
         totalVotes: Number(p.totalVotes),
         createdAt: Number(p.createdAt) * 1000      // stored on-chain in v2
     }));
-    const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id));
+    const mine = hiddenByUser();
+    const shown = polls.filter((p) => !HIDDEN_POLLS.includes(p.id) && !mine.includes(p.id));
     savePolls(shown);
     return shown;
 }
@@ -210,7 +218,7 @@ async function loadMyVoteTxs(address) {
     try {
         const evs = await queryEvents(readContract.filters.Voted(null, address));
         for (const ev of evs) map[Number(ev.args.pollId)] = ev.transactionHash;
-    } catch (err) { console.log("Could not read vote transactions", err); }
+    } catch (err) { debugLog("Could not read vote transactions", err); }
     myVoteTxCache = { address: address.toLowerCase(), map };
     return map;
 }
@@ -346,7 +354,7 @@ async function fillProfile(address) {
                 }).join("")
                 : '<li class="muted">No votes yet</li>';
         }
-    } catch (err) { console.log("Profile load failed", err); }
+    } catch (err) { debugLog("Profile load failed", err); }
 }
 document.addEventListener("wallet-connected", (e) => fillProfile(e.detail.address));
 
@@ -361,7 +369,16 @@ async function loadHome() {
         livePollCount = live.length;
         setText("liveCount", live.length);
         setText("totalPolls", polls.length);
-        setText("totalVotes", polls.reduce((n, p) => n + p.totalVotes, 0).toLocaleString("en-IN"));
+        const allVotes = polls.reduce((n, p) => n + p.totalVotes, 0);
+        setText("totalVotes", allVotes.toLocaleString("en-IN"));
+        // Small numbers are honest numbers: say why, instead of pretending
+        const note = document.getElementById("bandNote");
+        if (note) {
+            note.textContent = allVotes < 25
+                ? "Counting from a fresh start: VERITY moved to its version 2 contract on 15 November 2026. Polls from version 1 still exist on the blockchain, linked from the Docs page."
+                : "";
+            note.classList.toggle("hidden", allVotes >= 25);
+        }
         setText("liveWord", live.length === 1 ? "poll" : "polls");
         document.querySelectorAll(".num-wait").forEach((el) => el.classList.remove("num-wait"));   // real numbers are in
 
@@ -388,7 +405,7 @@ async function loadHome() {
         document.getElementById("emptyPoll").classList.add("hidden");
         updateCountdown();
     } catch (err) {
-        console.log("Home load failed", err);
+        debugLog("Home load failed", err);
         toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
 }

@@ -56,6 +56,12 @@
         $("pgLoading").classList.add("hidden");
         $("pgBody").classList.remove("hidden");
         document.title = poll.question + " · VERITY";
+        // Link previews for shared poll links
+        const setMeta = (sel, v) => { const m = document.querySelector(sel); if (m) m.setAttribute("content", v); };
+        setMeta('meta[property="og:title"]', poll.question + " · VERITY"); setMeta('meta[name="twitter:title"]', poll.question + " · VERITY");
+        setMeta('meta[property="og:url"]', location.origin + "/poll/" + poll.id);
+        const d = `${poll.options.length} options · ${poll.totalVotes} vote${poll.totalVotes === 1 ? "" : "s"} · ${poll.category} poll on VERITY, recorded on Ethereum Sepolia.`;
+        setMeta('meta[property="og:description"]', d); setMeta('meta[name="twitter:description"]', d);
         const live = isLive();
         $("pgStatus").className = live ? "live-pill" : "ended-pill";
         $("pgStatus").innerHTML = live ? '<span class="live-dot"></span> LIVE' : (poll.isOpen ? "ENDED" : "CLOSED BY CREATOR");
@@ -88,7 +94,7 @@
         } else {
             html = `<div class="pg-card-head"><h3>Cast your vote</h3><span class="muted">${fmt(total)} ${total === 1 ? "vote" : "votes"} so far</span></div>
                 <div class="pg-opts">${poll.options.map((o, i) => `<button class="pg-opt" data-pick="${i}" ${sending ? "disabled" : ""}><span>${escapeHTML(o)}</span><span class="pg-opt-go">Vote →</span></button>`).join("")}</div>
-                <p class="pg-why muted">Results appear after you vote, so nobody just follows the crowd. <a href="how-it-works.html#why-results">Why?</a></p>`;
+                <p class="pg-why muted">Results appear here after you vote, so nobody just follows the crowd. The counts are always public on the blockchain. <a href="how-it-works.html#why-results">Why?</a></p>`;
         }
         $("pgOptions").innerHTML = html;
 
@@ -103,6 +109,7 @@
 
         $("pgPresent").classList.toggle("hidden", !live);
         $("pgEtherscan").href = `https://sepolia.etherscan.io/address/${CONTRACT_ADDRESS}#events`;
+        $("pgReport").href = `contact.html?report=${poll.id}`;
         if (!$("pgQr").innerHTML && typeof qrcode === "function") {
             const q = qrcode(0, "M"); q.addData(permalink); q.make();
             $("pgQr").innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
@@ -205,4 +212,11 @@
     if (walletReady) load(); else document.addEventListener("wallet-ready", () => load(), { once: true });
     document.addEventListener("wallet-connected", () => load());
     setInterval(() => { if (!sending && poll && isLive() && !document.querySelector(".x-backdrop, .welcome-backdrop:not(.hidden)")) load(true); }, 20000);
+})();
+
+// Highlight the page you came from (Live Polls or Polls) in the sidebar
+(function markOrigin() {
+    const fromLive = /\/live(\.html)?(\?|#|$)/.test(document.referrer) || new URLSearchParams(location.search).get("from") === "live";
+    if (!fromLive) return;
+    document.querySelectorAll(".nav-item").forEach((a) => a.classList.toggle("active", /live\.html$/.test(a.getAttribute("href"))));
 })();

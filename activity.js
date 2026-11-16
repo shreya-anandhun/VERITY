@@ -132,7 +132,7 @@ async function renderAll() {
     const old = cachedHistory();
     if (old && !transactions.length) { transactions = old; paint(); }
     try { await loadHistory(); }
-    catch (err) { console.log("History load failed", err); toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad"); }
+    catch (err) { debugLog("History load failed", err); toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad"); }
     document.querySelector(".content").classList.remove("waiting");
     paint();
 }

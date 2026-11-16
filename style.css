@@ -2398,3 +2398,32 @@ select.field {
     .btn-demo { padding: 5px 16px 5px 5px; }
     .btn-demo-play { width: 32px; height: 32px; }
 }
+
+/* Decorative sparkles sit past the right edge on purpose; never let them cause sideways scroll */
+.content.home { overflow-x: clip; }
+html { overflow-x: clip; }
+
+/* ===== 35. About / Privacy / Terms / Contact ===== */
+.doc-p { margin: 0; color: var(--text-dim); font-size: 0.95rem; line-height: 1.65; }
+.doc-p b, .doc-p a { color: var(--white); }
+.doc-p a { text-decoration: underline; text-underline-offset: 3px; }
+.doc-card + .doc-card .doc-p { margin-top: 0; }
+.contact-form { display: grid; gap: 16px; }
+.cf-row { display: grid; gap: 6px; }
+.cf-row label { font-size: 0.8rem; font-weight: 500; color: var(--white); }
+.cf-row label .opt { font-weight: 400; color: var(--text-dim); margin-left: 6px; }
+.cf-row input, .cf-row select, .cf-row textarea {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg);
+    color: var(--white); font: inherit; font-size: 0.95rem; box-sizing: border-box;
+}
+.cf-row textarea { resize: vertical; min-height: 120px; }
+.cf-row input:focus, .cf-row select:focus, .cf-row textarea:focus { outline: 2px solid var(--mint); outline-offset: 1px; border-color: transparent; }
+.cf-row select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 40px; }
+.cf-err { margin: 0; color: #FF9C8A; font-size: 0.88rem; }
+.cf-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.cf-done h3 { margin-bottom: 8px; }
+.cf-done .btn-ghost { margin-top: 16px; }
+.foot-legal { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pg-report { opacity: 0.6; font-size: 0.8rem; }
+.pg-report:hover { opacity: 1; }
+.h-band-note { margin: 12px 4px 0; font-size: 0.84rem; color: var(--text-dim); }

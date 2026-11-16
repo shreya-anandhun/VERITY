@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About · VERITY</title>
+
+    <link rel="preconnect" href="https://ethereum-sepolia-rpc.publicnode.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap">
+
+    <meta name="description" content="VERITY is a tamper-proof voting app on Ethereum, built by Shreya Anandhun for CodeKrafters at SRM. Here is what it is, who made it and why.">
+
+    <!-- Link previews (Open Graph / Twitter) -->
+    <link rel="canonical" href="https://shreya-verity.vercel.app/about">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="VERITY">
+    <meta property="og:title" content="About · VERITY">
+    <meta property="og:description" content="VERITY is a tamper-proof voting app on Ethereum, built by Shreya Anandhun for CodeKrafters at SRM. Here is what it is, who made it and why.">
+    <meta property="og:url" content="https://shreya-verity.vercel.app/about">
+    <meta property="og:image" content="https://shreya-verity.vercel.app/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="VERITY: Vote once. Verify forever. Tamper-proof polls on Ethereum.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About · VERITY">
+    <meta name="twitter:description" content="VERITY is a tamper-proof voting app on Ethereum, built by Shreya Anandhun for CodeKrafters at SRM. Here is what it is, who made it and why.">
+    <meta name="twitter:image" content="https://shreya-verity.vercel.app/og-image.png">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#1B2428">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="fx.css">
+    <script>try{var t=JSON.parse(localStorage.getItem("verity-theme"))||"dark";if(t==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+    <a class="skip-link" href="#mainContent">Skip to content</a>
+
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="sparkle" viewBox="-1 -1 2 2">
+            <path d="M0,-1 C0.08,-0.08 0.08,-0.08 1,0 C0.08,0.08 0.08,0.08 0,1 C-0.08,0.08 -0.08,0.08 -1,0 C-0.08,-0.08 -0.08,-0.08 0,-1Z"/>
+        </symbol>
+    </svg>
+
+    <!-- ============ SIDEBAR (same as Home) ============ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <svg class="brand-mark"><use href="#sparkle"/></svg>
+            <span>VERITY</span>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+                Home
+            </a>
+            <a href="live.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+                Live Polls
+            </a>
+            <a href="polls.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>
+                Polls
+            </a>
+            <a href="activity.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
+                My Activity
+            </a>
+            <a href="settings.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+                Settings
+            </a>
+            <a href="demo.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg>
+                Demo
+            </a>
+            <a href="how-it-works.html" class="nav-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="17.5" r=".6"/></svg>
+                How It Works
+            </a>
+            <a href="docs.html" class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+                Docs
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="network-dot"></span> Ethereum Sepolia
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main main-wide" id="mainContent">
+
+        <header class="topbar">
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <h1 class="page-title">About</h1>
+
+            <div class="profile-wrap">
+                <button class="profile-btn" id="profileBtn" aria-label="Profile and wallet" aria-haspopup="dialog" aria-expanded="false">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </button>
+                <div class="profile-panel" id="profilePanel">
+                    <div class="pp-head">
+                        <div class="pp-avatar">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                        </div>
+                        <div>
+                            <input class="pp-name" id="displayName" placeholder="Add a display name" maxlength="24" aria-label="Display name">
+                            <p class="pp-address" id="ppAddress">Wallet not connected</p>
+                        </div>
+                    </div>
+                    <div class="pp-stats hidden">
+                        <div><span id="statVoted">0</span><small>Polls voted</small></div>
+                        <div><span id="statCreated">0</span><small>Polls created</small></div>
+                    </div>
+                    <p class="pp-label">Your votes</p>
+                    <ul class="pp-list" id="ppVotes">
+                        <li class="muted">Connect your wallet to see your votes</li>
+                    </ul>
+                    <button class="pp-wallet-btn" id="ppWalletBtn">Connect Wallet</button>
+                    <button class="pp-signout hidden" id="ppSignOut">Sign out and forget my name</button>
+                    <p class="pp-note">Your display name is saved only on this device until you sign out. VERITY never asks for personal details.</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="content content-wide docs">
+            <p class="page-sub">What VERITY is, who built it, and why.</p>
+
+            <div class="doc-card">
+                <h3>The idea</h3>
+                <p class="doc-p">Every online poll asks you to trust whoever runs it. They can change a number, drop a vote, or show you a result that never happened, and you would never know. VERITY was built to remove that trust. Every poll and every vote is written to the Ethereum blockchain, where it is copied across thousands of computers and can never be edited or deleted, not even by the person who built this site. Anyone can check any result at any time. That is the whole project in one line: <b>vote once, verify forever.</b></p>
+            </div>
+
+            <div class="doc-card">
+                <h3>Who made it</h3>
+                <p class="doc-p">VERITY is built and maintained by <b>Shreya Anandhun</b>, a first-year B.Tech Computer Science student at SRM University, Ramapuram, as a project for the <b>Web3 domain of CodeKrafters</b>, the college coding club. It started as a club tool for honest votes on things like workshop topics and event choices, and grew into a full product: a verified smart contract, a website anyone can use, and a demo you can try in three minutes.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>What it is, and what it isn't</h3>
+                <ul class="doc-list">
+                    <li><b>It is</b> a transparent voting tool for small communities: clubs, classes, apartment associations, event planning.</li>
+                    <li><b>It is</b> running on Sepolia, Ethereum's test network, so voting costs nobody real money. The code would run unchanged on the main network or a cheaper one like Polygon.</li>
+                    <li><b>It isn't</b> a secret ballot. Votes are linked to wallet addresses, not names, but anyone can see which address chose which option. That openness is what makes the results checkable.</li>
+                    <li><b>It isn't</b> one person, one vote. The contract guarantees one vote per <b>wallet</b>, and wallets are free to create. It's a fair rule for people who know each other; for anything high-stakes it needs a membership check on top.</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h3>How it's built</h3>
+                <table class="doc-table">
+                    <tr><th>Layer</th><th>What</th></tr>
+                    <tr><td class="mono">Contract</td><td>VotingV2, written in Solidity 0.8.34. No owner, no admin, no upgrade switch. 29 automated tests. <a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#code" target="_blank" rel="noopener">Verified on Etherscan ↗</a></td></tr>
+                    <tr><td class="mono">Website</td><td>Plain HTML, CSS and JavaScript, no framework and no build step. ethers.js v6 talks to the blockchain. There is no server and no database.</td></tr>
+                    <tr><td class="mono">Wallets</td><td>Phantom and MetaMask, on desktop and phone.</td></tr>
+                    <tr><td class="mono">Hosting</td><td>Source on <a href="https://github.com/shreya-anandhun/VERITY" target="_blank" rel="noopener">GitHub ↗</a>, deployed by Vercel on every push.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-card">
+                <h3>What's next</h3>
+                <ul class="doc-list">
+                    <li><b>Token-gated voting:</b> only wallets holding a club membership token can vote, so it becomes one vote per member.</li>
+                    <li><b>Gasless voting:</b> the organiser covers the tiny network fee so voters don't need test ETH at all.</li>
+                    <li><b>Private ballots:</b> zero-knowledge proofs, which prove a vote is valid without revealing the choice.</li>
+                </ul>
+                <p class="doc-note">Questions, ideas or bugs? <a href="contact.html">Get in touch</a>. Want the technical detail? Read the <a href="docs.html">Docs</a>.</p>
+            </div>
+        </section>
+
+        <footer class="site-foot">
+            <div class="sf-brand">
+                <b><svg viewBox="0 0 24 24"><use href="#sparkle"/></svg>VERITY</b>
+                <p>Tamper-proof polls on Ethereum. Built by Shreya Anandhun for CodeKrafters, SRM.</p>
+            </div>
+            <nav aria-label="Use VERITY"><h5>Use it</h5><a href="live.html">Live polls</a><a href="polls.html">All polls</a><a href="demo.html">Demo video</a></nav>
+            <nav aria-label="Verify VERITY"><h5>Verify it</h5><a href="https://sepolia.etherscan.io/address/0x333b410002b0c6c4639b98a5c5d93d916a092848#code" target="_blank" rel="noopener">Contract on Etherscan ↗</a><a href="docs.html">Docs</a><a href="about.html">About</a><a href="how-it-works.html">How it works</a></nav>
+            <nav aria-label="The project"><h5>Project</h5><a href="about.html">About</a><a href="https://github.com/shreya-anandhun/VERITY" target="_blank" rel="noopener">Source on GitHub ↗</a><a href="contact.html">Contact / report</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav>
+            <p class="sf-bottom">Runs on the Sepolia test network · VERITY charges no fees · No owner, no admin, no edit button</p>
+        </footer>
+    </main>
+
+    <!-- ============ CONNECT WALLET POPUP ============ -->
+    <div class="welcome-backdrop hidden" id="connectModal" role="dialog" aria-modal="true" aria-label="Connect your wallet">
+        <div class="welcome-box">
+            <svg class="welcome-sparkle"><use href="#sparkle"/></svg>
+            <p class="welcome-kicker">Connect wallet</p>
+            <h2 id="connectTitle">Choose your wallet</h2>
+            <p class="welcome-text" id="connectIntro">VERITY works with Phantom and MetaMask. Your wallet opens its own window to approve, so VERITY never sees your password or keys.</p>
+
+            <div class="wallet-choices">
+                <button class="wallet-choice" data-wallet="phantom">
+                    <span class="wc-logo phantom" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 18V11a7 7 0 0 1 14 0v7l-2.3-1.6L14.3 18 12 16.4 9.7 18l-2.4-1.6z"/><circle cx="10" cy="11" r="1.1"/><circle cx="14" cy="11" r="1.1"/></svg></span>
+                    <span>
+                        <strong>Phantom</strong>
+                        <small data-wallet-status="phantom">Checking this browser…</small>
+                    </span>
+                    <span class="wc-go" aria-hidden="true">→</span>
+                </button>
+                <button class="wallet-choice" data-wallet="metamask">
+                    <span class="wc-logo metamask" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 4 6.5 4.8L9.3 6zM20 4l-6.5 4.8L14.7 6zM4 4l1.6 7L4.5 15l2.8 4.5 3.2-1.2h3l3.2 1.2 2.8-4.5L18.4 11 20 4l-5.5 5.5h-5z"/></svg></span>
+                    <span>
+                        <strong>MetaMask</strong>
+                        <small data-wallet-status="metamask">Checking this browser…</small>
+                    </span>
+                    <span class="wc-go" aria-hidden="true">→</span>
+                </button>
+            </div>
+
+            <p class="welcome-text small-note" id="connectNoExt">New to wallets? Both are free. Install one, come back to this page, and connect.</p>
+            <button class="later-btn" id="connectCancel">Cancel</button>
+        </div>
+    </div>
+
+    <script src="ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+    <script src="contract.js"></script>
+    <script src="fx.js"></script>
+</body>
+</html>

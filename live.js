@@ -77,7 +77,7 @@ async function loadLive() {
             if (changed && sending === null && !document.querySelector(".welcome-backdrop:not(.hidden), .x-backdrop")) render();
         });
     } catch (err) {
-        console.log("Live polls load failed", err);
+        debugLog("Live polls load failed", err);
         toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
     ranked = rankPolls();
@@ -98,6 +98,9 @@ function render() {
     const shown = ranked.filter((p) => matchesSearch(p) || p.id === openId);
     const empty = document.getElementById("emptyLive");
     empty.classList.toggle("hidden", shown.length > 0);
+    setText("pageSub", searchText
+        ? `${shown.length} of ${livePolls.length} live match your search`
+        : `${livePolls.length} live · updates every 15 s`);
     if (!shown.length) {
         empty.textContent = ranked.length ? "No live polls match your search" : "No polls currently live";
         grid.innerHTML = ""; buildRail(); return;
@@ -424,6 +427,12 @@ document.getElementById("reportForm").addEventListener("submit", (e) => {
     };
 });
 document.getElementById("reportClose").addEventListener("click", () => reportModal.classList.add("hidden"));
+document.getElementById("reportHide").addEventListener("click", () => {
+    hidePollForMe(reportingId);
+    toast("Hidden on this device. You can show hidden polls again from Settings.", "good");
+    reportModal.classList.add("hidden");
+    setTimeout(() => location.reload(), 900);
+});
 
 // Close any popup by clicking the dark backdrop
 [confirmModal, reportModal].forEach((m) => {

@@ -147,7 +147,7 @@
                     pillTimer = setTimeout(() => pill.classList.remove("show"), 9000);
                 }
                 lastTotal = total; lastBlock = block;
-            } catch (err) { console.log("Presenter refresh failed", err); }
+            } catch (err) { debugLog("Presenter refresh failed", err); }
         }
         paint(poll);
         requestAnimationFrame(() => paint(poll));

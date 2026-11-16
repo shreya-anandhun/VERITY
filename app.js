@@ -12,6 +12,9 @@ const SEPOLIA_CHAIN_ID = "0xaa36a7";   // Sepolia's network ID (11155111) in hex
 // Your deployed Voting contract (paste the full address from Remix here)
 const CONTRACT_ADDRESS = "0x333b410002b0c6c4639b98a5c5d93d916a092848";
 
+// Quiet by default. Run  localStorage.setItem("verity-debug", "1")  in the console to see why something failed.
+const debugLog = (...args) => { try { if (localStorage.getItem("verity-debug")) console.warn("[VERITY]", ...args); } catch (e) {} };
+
 let walletReady = false;   // true once we know whether a wallet was already connected
 
 
@@ -342,7 +345,7 @@ async function showConnected(address) {
         const eth = Number(BigInt(weiHex)) / 1e18;
         setText("cardBalance", eth.toFixed(3) + " ETH");
     } catch (err) {
-        console.log("Could not read balance", err);
+        debugLog("Could not read balance", err);
     }
 
     // Let other scripts (like live.js) know
@@ -413,12 +416,12 @@ async function connectWallet(key) {
                 params: [{ chainId: SEPOLIA_CHAIN_ID }]
             });
         } catch (err) {
-            console.log("Network switch skipped:", err.message);
+            debugLog("Network switch skipped:", err.message);
         }
 
         await showConnected(accounts[0]);
     } catch (err) {
-        console.log("Connection cancelled:", err.message);
+        debugLog("Connection cancelled:", err.message);
     } finally {
         if (connectBtn) connectBtn.disabled = false;
     }

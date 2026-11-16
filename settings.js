@@ -56,3 +56,21 @@ document.getElementById("clearData").addEventListener("click", () => {
     } catch (err) {}
     location.reload();
 });
+
+
+// Hidden polls (chosen from a poll's Report popup)
+(function hiddenPollsSetting() {
+    const count = document.getElementById("hiddenCount"), btn = document.getElementById("unhideAll");
+    if (!count || !btn) return;
+    const refresh = () => {
+        const n = hiddenByUser().length;
+        count.textContent = n ? `${n} poll${n === 1 ? "" : "s"} hidden on this device` : "You haven't hidden any polls";
+        btn.disabled = !n;
+    };
+    btn.addEventListener("click", () => {
+        localStorage.removeItem("verity-hidden");
+        try { localStorage.removeItem("verity-polls-last"); sessionStorage.removeItem("verity-polls-cache"); } catch (e) {}
+        refresh(); toast("Hidden polls will show again", "good");
+    });
+    refresh();
+})();

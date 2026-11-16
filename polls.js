@@ -169,7 +169,7 @@ async function loadAll(first = false) {
         allPolls = await loadPolls();
         myVotes = await loadMyVotes(currentAccount, allPolls);
     } catch (err) {
-        console.log("Polls load failed", err);
+        debugLog("Polls load failed", err);
         toast("Something went wrong loading from Sepolia: " + (err.shortMessage || err.message).slice(0, 80), "bad");
     }
     document.querySelector(".content").classList.remove("waiting");
