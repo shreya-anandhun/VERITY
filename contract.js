@@ -267,6 +267,7 @@ function forgetTx(list, hash) {
 // Turn an ethers error into something a person can read
 function friendlyError(err) {
     const msg = (err && (err.reason || err.shortMessage || err.message)) || "Something went wrong";
+    debugLog("Transaction error:", err);
     if (/user rejected|user denied|rejected the request/i.test(msg)) return null;   // they pressed Cancel in Phantom: not an error
     if (/Already voted/i.test(msg)) return "This wallet has already voted in this poll";
     if (/Poll is closed/i.test(msg)) return "This poll has closed";
@@ -276,6 +277,7 @@ function friendlyError(err) {
     if (/No such (poll|option)/i.test(msg)) return "That poll or option doesn't exist";
     if (/Title must be|Category must be|2 to 10 options|Each option must be|End time must be|at most a year/i.test(msg))
         return (msg.match(/(Title must be[^"]*|Category must be[^"]*|2 to 10 options|Each option must be[^"]*|End time must be in the future|Polls can last at most a year)/) || [msg])[0];
+    if (/could not coalesce/i.test(msg)) return "Your wallet and the network disagreed about this transaction. Check that the wallet has test ETH, that no earlier request is still waiting in Phantom, then try again.";
     if (/missing revert data|execution reverted|CALL_EXCEPTION/i.test(msg)) return "The network rejected this. Most likely this wallet already voted, or the poll has closed.";
     return msg.length > 170 ? msg.slice(0, 170) + "…" : msg;
 }
