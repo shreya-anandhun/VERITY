@@ -32,7 +32,7 @@
     /* ---------- 2. Cards ---------- */
     // tilt + bob: tile-like cards.  glow only: cards full of controls (a moving form is annoying)
     var TILT = ".hstat, .hhow, .act-tile, .demo-step, .h-step, .h-pillar, .live-card:not(.expanded)";
-    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .flow-step, .h-feature, .h-mini, .h-feed, .h-contract";
+    var GLOW = ".set-group, .poll-row, .result-row, .tl-card, .verify-bar, .demo-video, .live-card.expanded, .h-feature, .h-mini, .h-feed, .h-contract";
     var BOB  = ".hstat, .hhow, .act-tile, .demo-step, .live-card:not(.expanded)";
 
     // For the first few seconds after a page opens, every box slides in from the sides
