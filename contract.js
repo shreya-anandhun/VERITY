@@ -331,7 +331,7 @@ function toast(text, kind = "") {
     el.textContent = text;
     el.className = "toast show " + kind;
     clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove("show"), 4200);
+    el._t = setTimeout(() => el.classList.remove("show"), Math.max(4200, text.length * 60));
 }
 
 

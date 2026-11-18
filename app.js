@@ -430,6 +430,7 @@ async function connectWallet(key) {
 // fully removing the site is done inside Phantom (Connected apps).
 // Sign out = VERITY forgets the wallet AND the display name (theme and settings stay).
 // Phantom itself keeps its own memory of the site; fully removing VERITY is done inside Phantom.
+function chosenWalletName() { return getProvider() && getProvider().isPhantom ? "Phantom" : "Your wallet"; }
 async function disconnectWallet() {
     const provider = getProvider();
     try {
@@ -447,7 +448,7 @@ async function disconnectWallet() {
     showGreeting();
     updateSignOutLink();
     profilePanel.classList.remove("open");
-    toast("Signed out. See you next time.", "");
+    toast("Signed out. " + chosenWalletName() + " still remembers this site. To make it ask again, remove VERITY from its Connected apps, or lock the wallet.", "");
 }
 
 
