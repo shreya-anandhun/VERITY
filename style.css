@@ -2427,3 +2427,27 @@ html { overflow-x: clip; }
 .pg-report { opacity: 0.6; font-size: 0.8rem; }
 .pg-report:hover { opacity: 1; }
 .h-band-note { margin: 12px 4px 0; font-size: 0.84rem; color: var(--text-dim); }
+
+/* ===== 36. Home boxes: the same mint hover glow as every other box ===== */
+.h-step, .h-pillar, .h-contract, .h-mini, .h-band, .h-feed, .h-faq details, .h-feature {
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+.h-step:hover, .h-pillar:hover, .h-mini:hover, .h-band:hover, .h-feed:hover, .h-faq details:hover, .h-faq details[open], .h-feature:hover {
+    border-color: rgba(187, 255, 216, 0.4);
+    box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 30px rgba(187, 255, 216, 0.14);
+}
+.h-contract { background: rgba(187, 255, 216, 0.03); }
+.h-contract:hover, .h-contract:focus-visible {
+    border-style: solid; border-color: rgba(187, 255, 216, 0.6); background: rgba(187, 255, 216, 0.07);
+    box-shadow: 0 0 0 1px rgba(187, 255, 216, 0.35), 0 0 30px rgba(187, 255, 216, 0.18);
+}
+.h-contract > span:last-child { transition: transform 0.25s; }
+.h-contract:hover > span:last-child { transform: translate(3px, -3px); }
+:root[data-theme="light"] .h-step:hover, :root[data-theme="light"] .h-pillar:hover, :root[data-theme="light"] .h-mini:hover,
+:root[data-theme="light"] .h-band:hover, :root[data-theme="light"] .h-feed:hover, :root[data-theme="light"] .h-faq details:hover,
+:root[data-theme="light"] .h-faq details[open], :root[data-theme="light"] .h-feature:hover,
+:root[data-theme="light"] .h-contract:hover, :root[data-theme="light"] .h-contract:focus-visible {
+    border-color: #7E4FD8; box-shadow: 0 0 0 1.5px rgba(126, 79, 216, 0.7), 0 8px 32px rgba(126, 79, 216, 0.3);
+}
+:root[data-theme="light"] .h-contract { background: transparent; }
+:root[data-theme="light"] .h-contract:hover { background: #F7F2FD; }
